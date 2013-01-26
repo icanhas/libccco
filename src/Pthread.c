@@ -51,8 +51,11 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	pthread_attr_setdetachstate(&at, PTHREAD_CREATE_JOINABLE);
 	t->fn = fn;
 	t->arg = arg;
-	if(pthread_create(&p, &at, run, t) != 0)
+	if(pthread_create(&p, &at, run, t) != 0){
 		errorf("createthread -- pthread_create failed\n");
+		free(t);
+		return nil;
+	}
 	t->t = p;
 	t->attr = at;
 	return t;
