@@ -2,6 +2,7 @@
 
 ifeq ($(host),mingw32)
   E=.exe
+  platlibs=-lkernel32
 else
   platlibs=-lpthread
 endif
