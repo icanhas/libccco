@@ -1,8 +1,8 @@
-typedef struct _Lock		Lock;
+typedef struct Chan	Chan;
+typedef struct Alt	Alt;
+typedef struct Proc	Proc;
+typedef struct _Lock	Lock;
 typedef struct _Thread	Thread;
-typedef struct Chan		Chan;
-typedef struct Alt		Alt;
-typedef struct Proc		Proc;
 
 typedef enum Chanop {
 	Chanend,
@@ -13,24 +13,24 @@ typedef enum Chanop {
 } Chanop;	/* mimics Plan 9 channel ops */
 
 struct Chan {
-	Lock	*l;
-	int	elsz;	/* size of elems in channel */
-	int	nel;	/* no. elems in channel */
-	void*	b;	/* buffer */
+	Lock*	l;
+	int	elsz;	/* size of elems in buffer */
+	int	nel;	/* no. elems in buffer */
+	void*	b;	/* the buffer */
 };
 
 struct Alt {
-	Chan	*c;
+	Chan*	c;
 };
 
 struct Proc {
-	Thread	*t;
+	Thread*	t;
 	char*	name;
 };
 
-Proc*	proccreate(void (*fn)(void*), void*, int);
+Proc*	proccreate(void (*)(void*), void*, int);
 void	procfree(Proc*);
-int	procinit(Proc*, void (*fn)(void*), void*, int);
+int	procinit(Proc*, void (*)(void*), void*, int);
 void	prockill(Proc*);
 Chan*	chancreate(int, int);
 void	chanfree(Chan*);
