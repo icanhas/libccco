@@ -58,8 +58,8 @@ createlock(void)
 	pthread_mutexattr_t at;
 	
 	lok = malloc(sizeof *lok);
-		if(lok == nil)
-			return nil;
+	if(lok == nil)
+		return nil;
 	if(pthread_mutexattr_init(&at) != 0)
 		return nil;
 	if(pthread_mutex_init(&l, &at) != 0)
