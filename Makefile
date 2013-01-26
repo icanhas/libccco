@@ -3,6 +3,7 @@ O=o
 A=a
 inc=-Iinclude
 name=libhoares
+libname=lib/${name}.$A
 ver=0.0.1
 
 -include Makeconfig
@@ -15,17 +16,18 @@ ofiles= \
   src/chancreate.$O \
   src/util.$O
 
-all: ${name}.$A
+all: ${libname}
 	
 .c.$O:
 	${CC} ${CFLAGS} ${inc} -c -o $@ $<
 
-${name}.$A: ${ofiles}
+${libname}: ${ofiles}
+	mkdir -p lib
 	${AR} rsc $@ $^
 	
 clean:
 	rm -f ${ofiles}
-	rm -f ${name}.$A
+	rm -f ${libname}
 
 dist: clean
 	tar cf tmp.tar Makefile include src
