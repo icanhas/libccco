@@ -1,31 +1,33 @@
 CC=gcc
+O=o
+A=a
 inc=-Iinclude
+name=libhoares
 ver=0.0.1
 
 -include Makeconfig
 
 ofiles= \
-  src/Pthread.o \
-  src/proccreate.o \
-  src/procinit.o \
-  src/prockill.o \
-  src/util.o
+  src/Pthread.$O \
+  src/proccreate.$O \
+  src/procinit.$O \
+  src/prockill.$O \
+  src/util.$O
 
-all: libcsp.a
+all: ${name}.$A
 	
-.c.o:
+.c.$O:
 	${CC} ${CFLAGS} ${inc} -c -o $@ $<
 
-libcsp.a: ${ofiles}
+${name}.$A: ${ofiles}
 	${AR} rsc $@ $^
 	
 clean:
 	rm -f ${ofiles}
-	rm -f libcsp.a
+	rm -f ${name}.$A
 
 dist: clean
 	tar cf tmp.tar Makefile include src
-	gzip <tmp.tar >libcsp-${ver}.tar.gz
-	bzip2 <tmp.tar >libcsp-${ver}.tar.bz2
+	gzip <tmp.tar >${name}-${ver}.tar.gz
+	bzip2 <tmp.tar >${name}-${ver}.tar.bz2
 	rm tmp.tar
-
