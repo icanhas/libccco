@@ -1,15 +1,10 @@
-CC=gcc
-O=o
-A=a
-inc=-Iinclude
+inc=-I./include
 name=libhoares
 libname=lib/${name}.$A
 ver=0.0.1
 
--include Makeconfig
-
 ofiles= \
-  src/Pthread.$O \
+  ${platofiles} \
   src/proccreate.$O \
   src/procinit.$O \
   src/prockill.$O \
