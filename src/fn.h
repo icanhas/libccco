@@ -7,6 +7,7 @@ void*	emalloc(size_t);
  */
 Thread*	createthread(void (*)(void*), void*, size_t);
 void	killthread(Thread*);
+Lock*	createlock(void);
 int	initlock(Lock*);
 int	destroylock(Lock*);
 int	lock(Lock*);

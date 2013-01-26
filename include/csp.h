@@ -14,8 +14,8 @@ typedef enum Chanop {
 
 struct Chan {
 	Lock	*l;
-	size_t	esz;	/* size of elems in channel */
-	size_t	n;	/* no. elems in channel */
+	size_t	elsz;	/* size of elems in channel */
+	size_t	nel;	/* no. elems in channel */
 	void*	b;	/* buffer */
 };
 
@@ -25,8 +25,8 @@ struct Alt {
 
 struct Proc {
 	Thread	*t;
-	void	(*fn)(void*);	/* process 'main' */
-	void*	arg;		/* process args */
+	void	(*fn)(void*);	/* proc 'main' */
+	void*	arg;		/* proc args */
 	char*	name;
 };
 

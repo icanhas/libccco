@@ -12,6 +12,7 @@ ofiles= \
   src/proccreate.$O \
   src/procinit.$O \
   src/prockill.$O \
+  src/chancreate.$O \
   src/util.$O
 
 all: ${name}.$A

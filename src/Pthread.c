@@ -7,7 +7,7 @@
 
 struct _Lock {
 	pthread_mutex_t	l;
-	pthread_attr_t	attr;
+	pthread_mutexattr_t	attr;
 };
 
 struct _Thread {
@@ -48,6 +48,25 @@ killthread(Thread *t)
 	pthread_detach(t->t);
 	pthread_attr_destroy(&t->attr);
 	free(t);
+}
+
+Lock*
+createlock(void)
+{
+	Lock *lok;
+	pthread_mutex_t l;
+	pthread_mutexattr_t at;
+	
+	lok = malloc(sizeof *lok);
+		if(lok == nil)
+			return nil;
+	if(pthread_mutexattr_init(&at) != 0)
+		return nil;
+	if(pthread_mutex_init(&l, &at) != 0)
+		return nil;
+	lok->l = l;
+	lok->attr = at;
+	return lok;
 }
 
 int
