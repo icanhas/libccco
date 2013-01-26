@@ -5,7 +5,7 @@
 #include "fn.h"
 
 int
-procinit(Proc *p, void (*fn)(void*), void *arg, size_t stksz)
+procinit(Proc *p, void (*fn)(void*), void *arg, int stksz)
 {
 	Thread *t;
 

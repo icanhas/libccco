@@ -14,8 +14,8 @@ typedef enum Chanop {
 
 struct Chan {
 	Lock	*l;
-	size_t	elsz;	/* size of elems in channel */
-	size_t	nel;	/* no. elems in channel */
+	int	elsz;	/* size of elems in channel */
+	int	nel;	/* no. elems in channel */
 	void*	b;	/* buffer */
 };
 
@@ -28,18 +28,18 @@ struct Proc {
 	char*	name;
 };
 
-Proc*	proccreate(void (*fn)(void*), void*, size_t);
+Proc*	proccreate(void (*fn)(void*), void*, int);
 void	procfree(Proc*);
-int	procinit(Proc*, void (*fn)(void*), void*, size_t);
+int	procinit(Proc*, void (*fn)(void*), void*, int);
 void	prockill(Proc*);
-Chan*	chancreate(size_t, size_t);
+Chan*	chancreate(int, int);
 void	chanfree(Chan*);
 void	chanalt(Alt*);
-size_t	chanrecv(Chan*, void*);
+int	chanrecv(Chan*, void*);
 void*	chanrecvp(Chan*);
-size_t	channbrecv(Chan*, void*);
+int	channbrecv(Chan*, void*);
 void*	channbrecvp(Chan*);
-size_t	chansend(Chan*, void*);
-size_t	chansendp(Chan*, void*);
-size_t	channbsend(Chan*, void*);
-size_t	channbsendp(Chan*, void*);
+int	chansend(Chan*, void*);
+int	chansendp(Chan*, void*);
+int	channbsend(Chan*, void*);
+int	channbsendp(Chan*, void*);

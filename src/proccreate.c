@@ -5,7 +5,7 @@
 #include "fn.h"
 
 Proc*
-proccreate(void (*fn)(void*), void *arg, size_t stksz)
+proccreate(void (*fn)(void*), void *arg, int stksz)
 {
 	Proc *p;
 	Thread *t;

@@ -9,5 +9,5 @@ prockill(Proc *p)
 {
 	if(p == nil)
 		return;
-	killthread(p->t);
+	freethread(p->t);
 }

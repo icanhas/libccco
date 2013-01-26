@@ -5,8 +5,8 @@ void*	emalloc(size_t);
 /*
  * Platform-dependent things
  */
-Thread*	createthread(void (*)(void*), void*, size_t);
-void	killthread(Thread*);
+Thread*	createthread(void (*)(void*), void*, int);
+void	freethread(Thread*);
 Lock*	createlock(void);
 int	initlock(Lock*);
 int	destroylock(Lock*);

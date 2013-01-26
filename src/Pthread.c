@@ -33,7 +33,7 @@ run(void *arg)
 }
 
 Thread*
-createthread(void (*fn)(void*), void *arg, size_t stksz)
+createthread(void (*fn)(void*), void *arg, int stksz)
 {
 	Thread *t;
 	pthread_attr_t at;
@@ -59,7 +59,7 @@ createthread(void (*fn)(void*), void *arg, size_t stksz)
 }
 	
 void
-killthread(Thread *t)
+freethread(Thread *t)
 {
 	if(t == nil)
 		return;
