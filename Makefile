@@ -7,7 +7,9 @@ ver=0.0.1
 ofiles= \
   src/Pthread.o \
   src/proccreate.o \
-  src/prockill.o
+  src/procinit.o \
+  src/prockill.o \
+  src/util.o
 
 all: libcsp.a
 	
