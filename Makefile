@@ -18,12 +18,12 @@ libcsp.a: ${ofiles}
 	${AR} rsc $@ $^
 	
 clean:
-	rm ${ofiles}
-	rm libcsp.a
+	rm -f ${ofiles}
+	rm -f libcsp.a
 
 dist: clean
-	tar cf ./ tmp.tar
-	<tmp.tar gzip >libcsp.tar-${ver}.tgz
-	<tmp.tar bzip2 >libcsp.tar-${ver}.tbz2
+	tar cf tmp.tar Makefile include src
+	gzip <tmp.tar >libcsp-${ver}.tar.gz
+	bzip2 <tmp.tar >libcsp-${ver}.tar.bz2
 	rm tmp.tar
 
