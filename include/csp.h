@@ -25,8 +25,6 @@ struct Alt {
 
 struct Proc {
 	Thread	*t;
-	void	(*fn)(void*);	/* proc 'main' */
-	void*	arg;		/* proc args */
 	char*	name;
 };
 

@@ -16,7 +16,7 @@ thelib:
 install: all
 	cd src && make install ${libmkargs}
 	
-tests: install
+tests:
 	cd src/tests && make ${testmkargs}
 	
 clean:

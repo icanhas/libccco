@@ -11,9 +11,26 @@ struct _Lock {
 };
 
 struct _Thread {
+	void	(*fn)(void*);	/* proc 'main' */
+	void*	arg;		/* proc args */
 	pthread_t		t;
 	pthread_attr_t	attr;
 };
+
+/*
+ * pthread_create takes its fn parameter as void *(*)(void*), so
+ * Thread->fn itself cannot be passed to it.  This has the proper
+ * signature and wraps Thread->fn.
+ */
+static void*
+run(void *arg)
+{
+	Thread *t;
+	
+	t = (Thread*)arg;
+	t->fn(t->arg);
+	return nil;
+}
 
 Thread*
 createthread(void (*fn)(void*), void *arg, size_t stksz)
@@ -21,8 +38,6 @@ createthread(void (*fn)(void*), void *arg, size_t stksz)
 	Thread *t;
 	pthread_attr_t at;
 	pthread_t p;
-	/* FIXME: pthread wants ptr return type ;/ */
-	void *(*fnn)(void*) = (void *(*)(void*))fn;
 	
 	t = malloc(sizeof *t);
 	if(t == nil)
@@ -34,7 +49,9 @@ createthread(void (*fn)(void*), void *arg, size_t stksz)
 			errorf("createthread -- specified stack size too small (%u)\n", stksz);
 	}
 	pthread_attr_setdetachstate(&at, PTHREAD_CREATE_JOINABLE);
-	if(pthread_create(&p, &at, fnn, arg) != 0)
+	t->fn = fn;
+	t->arg = arg;
+	if(pthread_create(&p, &at, run, t) != 0)
 		errorf("createthread -- pthread_create failed\n");
 	t->t = p;
 	t->attr = at;

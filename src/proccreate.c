@@ -21,8 +21,6 @@ proccreate(void (*fn)(void*), void *arg, size_t stksz)
 		return nil;
 	}
 	p->t = t;
-	p->fn = fn;
-	p->arg = arg;
 	p->name = "<name>";
 	return p;
 }
