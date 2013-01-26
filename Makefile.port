@@ -13,7 +13,7 @@ ofiles= \
   src/chancreate.$O \
   src/util.$O
 
-all: mkdirs ${libpath} tests
+all: mkdirs ${libpath}
 	
 .c.$O:
 	${CC} ${CFLAGS} ${inc} -c -o $@ $<
@@ -25,12 +25,18 @@ mkdirs:
 ${libpath}: ${ofiles}
 	${AR} rsc $@ $^
 	
-tests: bin/test1$E
+install: all
+	cp ${libpath} /usr/local/lib/${libname}
+	chmod 0664 /usr/local/lib/${libname}
+	cp include/csp.h /usr/local/include/csp.h
+	chmod 0664 /usr/local/include/csp.h
 	
-bin/test1$E: src/tests/1.$O
-	${CC} ${LDFLAGS} -o $@ $^ -L./lib -lhoares -lpthread
+tests: install
+	cd src/tests && make CC=${CC} E=$E O=$O A=$A inc=../ bin=../../bin \
+		FORCE_PTHREAD=$FORCE_PTHREAD
 	
 clean:
+	cd src/tests && make clean E=$E O=$O A=$A inc=../ bin=../../../bin
 	rm -f ${ofiles}
 	rm -f ${libpath}
 

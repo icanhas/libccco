@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stddef.h>
-#include "csp.h"
+#include <csp.h>
 
 void
 f(void *p)

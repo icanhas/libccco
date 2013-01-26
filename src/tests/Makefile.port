@@ -1,0 +1,13 @@
+libs=-lhoares ${platlibs}
+b=${bin}
+
+all: $b/test1$E
+	
+.c.$O:
+	${CC} ${CFLAGS} ${inc} -c -o $@ $<
+	
+$b/test1$E: 1.$O
+	${CC} ${LDFLAGS} -o $@ $^ ${libs}
+	
+clean:
+	rm -f $b/test1$E 1.$O
