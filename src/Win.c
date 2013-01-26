@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdlib.h>
 #include <windows.h>
 #include "csp.h"
 #include "dat.h"
