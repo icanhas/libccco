@@ -31,6 +31,7 @@ struct Proc {
 };
 
 Proc*	proccreate(void (*fn)(void*), void*, size_t);
+void	procfree(Proc*);
 int	procinit(Proc*, void (*fn)(void*), void*, size_t);
 void	prockill(Proc*);
 Chan*	chancreate(size_t, size_t);

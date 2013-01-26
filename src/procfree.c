@@ -5,9 +5,10 @@
 #include "fn.h"
 
 void
-prockill(Proc *p)
+procfree(Proc *p)
 {
 	if(p == nil)
 		return;
 	killthread(p->t);
+	free(p);
 }

@@ -33,6 +33,7 @@ createthread(void (*fn)(void*), void *arg, size_t stksz)
 		if(pthread_attr_setstacksize(&at, stksz) != 0)
 			errorf("createthread -- specified stack size too small (%u)\n", stksz);
 	}
+	pthread_attr_setdetachstate(&at, PTHREAD_CREATE_JOINABLE);
 	if(pthread_create(&p, &at, fnn, arg) != 0)
 		errorf("createthread -- pthread_create failed\n");
 	t->t = p;

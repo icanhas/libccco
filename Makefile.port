@@ -1,28 +1,38 @@
 inc=-I./include
 name=libhoares
-libname=lib/${name}.$A
+libname=${name}.$A
+libpath=lib/${libname}
 ver=0.0.1
 
 ofiles= \
   ${platofiles} \
   src/proccreate.$O \
+  src/procfree.$O \
   src/procinit.$O \
   src/prockill.$O \
   src/chancreate.$O \
   src/util.$O
 
-all: ${libname}
+all: mkdirs ${libpath} tests
 	
 .c.$O:
 	${CC} ${CFLAGS} ${inc} -c -o $@ $<
-
-${libname}: ${ofiles}
+	
+mkdirs:
+	mkdir -p bin
 	mkdir -p lib
+
+${libpath}: ${ofiles}
 	${AR} rsc $@ $^
+	
+tests: bin/test1$E
+	
+bin/test1$E: src/tests/1.$O
+	${CC} ${LDFLAGS} -o $@ $^ -L./lib -lhoares -lpthread
 	
 clean:
 	rm -f ${ofiles}
-	rm -f ${libname}
+	rm -f ${libpath}
 
 dist: clean
 	tar cf tmp.tar Makefile include src
