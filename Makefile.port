@@ -28,6 +28,6 @@ nuke:
 
 dist: clean
 	tar cf tmp.tar Makefile.port GNUmakefile include src
-	gzip <tmp.tar >${name}-${ver}.tar.gz
-	bzip2 <tmp.tar >${name}-${ver}.tar.bz2
+	gzip <tmp.tar >libhoares-${ver}.tar.gz
+	bzip2 <tmp.tar >libhoares-${ver}.tar.bz2
 	rm tmp.tar
