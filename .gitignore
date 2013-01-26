@@ -1,0 +1,5 @@
+Makeconfig
+*.a
+*.o
+*.bz2
+*.gz
