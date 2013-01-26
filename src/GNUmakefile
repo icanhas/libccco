@@ -1,13 +1,13 @@
--include Makeconfig
-
 ifeq ($(host),mingw32)
   E=.exe
+  platofiles=Win.$O
 else
-  platlibs=-lpthread
+  platofiles=Pthread.$O
 endif
 
 ifeq ($(FORCE_PTHREAD),1)
-  platlibs=-lpthread
+  platofiles=Pthread.$O
 endif
 
+-include Makeconfig
 include Makefile.port

@@ -1,0 +1,35 @@
+name=libhoares
+libname=${name}.$A
+libpath=../lib/${libname}
+
+ofiles= \
+  ${platofiles} \
+  proccreate.$O \
+  procfree.$O \
+  procinit.$O \
+  prockill.$O \
+  chancreate.$O \
+  util.$O
+
+all: ${libpath}
+	
+.c.$O:
+	${CC} ${CFLAGS} ${inc} -c -o $@ $<
+
+${libpath}: ${ofiles}
+	${AR} rsc $@ $^
+	
+install: all
+	cp ${libpath} /usr/local/lib/${libname}
+	chmod 0664 /usr/local/lib/${libname}
+	cp ../include/csp.h /usr/local/include/csp.h
+	chmod 0664 /usr/local/include/csp.h
+	
+clean:
+	rm -f *.o
+	rm -f ${libpath}
+	
+nuke: clean
+	rm -f /usr/local/lib/${libname}
+	rm -f /usr/local/include/csp.h
+

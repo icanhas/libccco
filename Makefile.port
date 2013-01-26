@@ -1,45 +1,30 @@
-inc=-I./include
-name=libhoares
-libname=${name}.$A
-libpath=lib/${libname}
 ver=0.0.1
+libmkargs=CC=${CC} O=$O A=$A inc=-I../include \
+  host=${host} FORCE_PTHREAD=${FORCE_PTHREAD} ver=${ver}
+testmkargs=CC=${CC} E=$E O=$O A=$A inc=-I../ bin=../../bin \
+  host=${host} FORCE_PTHREAD=${FORCE_PTHREAD}
 
-ofiles= \
-  ${platofiles} \
-  src/proccreate.$O \
-  src/procfree.$O \
-  src/procinit.$O \
-  src/prockill.$O \
-  src/chancreate.$O \
-  src/util.$O
+all: mkdirs thelib
 
-all: mkdirs ${libpath}
-	
-.c.$O:
-	${CC} ${CFLAGS} ${inc} -c -o $@ $<
-	
 mkdirs:
 	mkdir -p bin
 	mkdir -p lib
 
-${libpath}: ${ofiles}
-	${AR} rsc $@ $^
+thelib:
+	cd src && make ${libmkargs}
 	
 install: all
-	cp ${libpath} /usr/local/lib/${libname}
-	chmod 0664 /usr/local/lib/${libname}
-	cp include/csp.h /usr/local/include/csp.h
-	chmod 0664 /usr/local/include/csp.h
+	cd src && make install ${libmkargs}
 	
 tests: install
-	cd src/tests && make CC=${CC} E=$E O=$O inc=../ bin=../../bin \
-		host=${host} FORCE_PTHREAD=$FORCE_PTHREAD
+	cd src/tests && make ${testmkargs}
 	
 clean:
-	cd src/tests && make clean E=$E O=$O inc=../ bin=../../../bin \
-		host=${host} 
-	rm -f src/*.o
-	rm -f ${libpath}
+	cd src && make clean ${libmkargs}
+	cd src/tests && make clean ${testmkargs}
+	
+nuke:
+	cd src && make nuke ${libmkargs}
 
 dist: clean
 	tar cf tmp.tar Makefile.port GNUmakefile include src
