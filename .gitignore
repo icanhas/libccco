@@ -4,4 +4,5 @@ Makeconfig
 *.bz2
 *.gz
 *.exe
+*.dll
 
