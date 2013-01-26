@@ -32,16 +32,17 @@ install: all
 	chmod 0664 /usr/local/include/csp.h
 	
 tests: install
-	cd src/tests && make CC=${CC} E=$E O=$O A=$A inc=../ bin=../../bin \
-		FORCE_PTHREAD=$FORCE_PTHREAD
+	cd src/tests && make CC=${CC} E=$E O=$O inc=../ bin=../../bin \
+		host=${host} FORCE_PTHREAD=$FORCE_PTHREAD
 	
 clean:
-	cd src/tests && make clean E=$E O=$O A=$A inc=../ bin=../../../bin
-	rm -f ${ofiles}
+	cd src/tests && make clean E=$E O=$O inc=../ bin=../../../bin \
+		host=${host} 
+	rm -f src/*.o
 	rm -f ${libpath}
 
 dist: clean
-	tar cf tmp.tar Makefile include src
+	tar cf tmp.tar Makefile.port GNUmakefile include src
 	gzip <tmp.tar >${name}-${ver}.tar.gz
 	bzip2 <tmp.tar >${name}-${ver}.tar.bz2
 	rm tmp.tar
