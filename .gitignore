@@ -3,3 +3,5 @@ Makeconfig
 *.o
 *.bz2
 *.gz
+*.exe
+
