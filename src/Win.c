@@ -17,7 +17,7 @@ struct _Thread {
 /*
  * This wraps Thread->fn.
  */
-DWORD WINAPI
+static DWORD WINAPI
 run(void *arg)
 {
 	Thread *t;
