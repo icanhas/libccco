@@ -4,19 +4,11 @@ typedef struct Proc	Proc;
 typedef struct _Lock	Lock;
 typedef struct _Thread	Thread;
 
-typedef enum Chanop {
-	Chanend,
-	Chansnd,
-	Chanrcv,
-	Channop,
-	Channoblk
-} Chanop;	/* mimics Plan 9 channel ops */
-
 struct Chan {
 	Lock*	l;
 	int	elsz;	/* size of elems in buffer */
 	int	nel;	/* no. elems in buffer */
-	void*	b;	/* the buffer */
+	void**	b;	/* the buffer */
 };
 
 struct Alt {

@@ -15,18 +15,7 @@ struct _Thread {
 	HANDLE	h;		/* thread handle */
 };
 
-/*
- * This wraps Thread->fn.
- */
-static DWORD WINAPI
-run(void *arg)
-{
-	Thread *t;
-	
-	t = (Thread*)arg;
-	t->fn(t->arg);
-	return nil;
-}
+static DWORD WINAPI	run(void*);
 
 Thread*
 createthread(void (*fn)(void*), void *arg, int stksz)
@@ -93,4 +82,17 @@ unlock(Lock *l)
 {
 	LeaveCriticalSection(&l->l);
 	return 0;
+}
+
+/*
+ * This wraps Thread->fn.
+ */
+static DWORD WINAPI
+run(void *arg)
+{
+	Thread *t;
+	
+	t = (Thread*)arg;
+	t->fn(t->arg);
+	return nil;
 }

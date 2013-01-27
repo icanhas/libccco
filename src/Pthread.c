@@ -17,20 +17,7 @@ struct _Thread {
 	pthread_attr_t	attr;
 };
 
-/*
- * pthread_create takes its fn parameter as void *(*)(void*), so
- * Thread->fn itself cannot be passed to it.  This has the proper
- * signature and wraps Thread->fn.
- */
-static void*
-run(void *arg)
-{
-	Thread *t;
-	
-	t = (Thread*)arg;
-	t->fn(t->arg);
-	return nil;
-}
+static void*	run(void*);
 
 Thread*
 createthread(void (*fn)(void*), void *arg, int stksz)
@@ -112,4 +99,19 @@ int
 unlock(Lock *l)
 {
 	return pthread_mutex_unlock(&l->l);
+}
+
+/*
+ * pthread_create takes its fn parameter as void *(*)(void*), so
+ * Thread->fn itself cannot be passed to it.  This has the proper
+ * signature and wraps Thread->fn.
+ */
+static void*
+run(void *arg)
+{
+	Thread *t;
+	
+	t = (Thread*)arg;
+	t->fn(t->arg);
+	return nil;
 }
