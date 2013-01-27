@@ -90,9 +90,12 @@ destroylock(Lock *l)
 }
 
 int
-lock(Lock *l)
+lock(Lock *l, int blocking)
 {
-	return pthread_mutex_lock(&l->l);
+	if(blocking)
+		return pthread_mutex_lock(&l->l);
+	else
+		return pthread_mutex_trylock(&l->l);
 }
 
 int

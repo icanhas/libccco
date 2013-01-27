@@ -11,5 +11,5 @@ void	freethread(Thread*);
 Lock*	createlock(void);
 int	initlock(Lock*);
 int	destroylock(Lock*);
-int	lock(Lock*);
+int	lock(Lock*, int);
 int	unlock(Lock*);
