@@ -9,6 +9,8 @@ ofiles= \
   procinit.$O \
   prockill.$O \
   chancreate.$O \
+  chanrecv.$O \
+  chansend.$O \
   util.$O
 
 all: ${libpath}

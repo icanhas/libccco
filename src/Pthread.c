@@ -16,7 +16,7 @@ enum {
 typedef struct Tqueue	Tqueue;
 
 struct Tqueue {
-	pthread_cond_t	*a;
+	pthread_cond_t*	a;
 	uint		max;
 	uint		front;
 	uint		rear;
@@ -28,6 +28,10 @@ struct _Lock {
 	pthread_t		holder;
 	pthread_mutex_t	l;
 	pthread_mutexattr_t	attr;
+};
+
+struct _Cond {
+	pthread_cond_t	c;
 };
 
 struct _Thread {
@@ -179,6 +183,50 @@ unlock(Lock *l)
 		dprintf("unlock: %p has queue; exchanged\n", l);
 		return 1;
 	}
+}
+
+Cond*
+createcond(void)
+{
+	Cond *p;
+	
+	if((p = malloc(sizeof *p)) == nil){
+		errorf("createcond -- out of memory\n");
+		return nil;
+	}
+	if(initcond(p) != 0){
+		free(p);
+		return nil;
+	}
+	return p;
+}
+
+int
+initcond(Cond *c)
+{
+	if(pthread_cond_init(&c->c, nil) != 0){
+		errorf("initcond -- pthread_cond_init failed\n");
+		return -1;
+	}
+	return 0;
+}
+
+int
+destroycond(Cond *c)
+{
+	return pthread_cond_destroy(&c->c);
+}
+
+int
+wait(Cond *c, Lock *l)
+{
+	return pthread_cond_wait(&c->c, &l->l);
+}
+
+int
+signal(Cond *c)
+{
+	return pthread_cond_signal(&c->c);
 }
 
 /*

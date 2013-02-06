@@ -13,3 +13,8 @@ int	initlock(Lock*);
 int	destroylock(Lock*);
 int	lock(Lock*, int);
 int	unlock(Lock*);
+Cond*	createcond(void);
+int	initcond(Cond*);
+int	destroycond(Cond*);
+int	wait(Cond*, Lock*);
+int	signal(Cond*);

@@ -1,7 +1,7 @@
 libs=-lhoares ${platlibs}
 b=${bin}
 
-all: $b/1$E
+all: $b/1$E $b/2$E
 	
 .c.$O:
 	${CC} ${CFLAGS} ${inc} -c -o $@ $<
@@ -9,5 +9,8 @@ all: $b/1$E
 $b/1$E: 1.$O
 	${CC} ${LDFLAGS} -o $@ $^ ${libs}
 	
+$b/2$E: 2.$O
+	${CC} ${LDFLAGS} -o $@ $^ ${libs}
+	
 clean:
-	rm -f $b/1$E 1.$O
+	rm -f $b/1$E 1.$O $b/2$E 2.$O

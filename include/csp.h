@@ -3,12 +3,17 @@ typedef struct Alt	Alt;
 typedef struct Proc	Proc;
 typedef struct _Lock	Lock;
 typedef struct _Thread	Thread;
+typedef struct _Cond	Cond;
 
 struct Chan {
 	Lock*	l;
+	Cond*	full;	/* when nel == max-1, this is signaled */
+	Cond*	flushed;
+	int	isfull;
 	int	elsz;	/* size of elems in buffer */
+	int	max;	/* sizeof b = elsz * max */
 	int	nel;	/* no. elems in buffer */
-	void**	b;	/* the buffer */
+	char*	b;	/* the buffer */
 };
 
 struct Alt {

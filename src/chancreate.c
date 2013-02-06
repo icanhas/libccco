@@ -9,6 +9,11 @@ chancreate(int elsz, int nel)
 	Chan *c;
 	Lock *l;
 	
+	c = malloc(sizeof *c);
+	if(c == nil){
+		errorf("chancreate -- out of memory\n");
+		return nil;
+	}
 	l = createlock();
 	if(l == nil){
 		errorf("chancreate -- failed to alloc lock\n");
