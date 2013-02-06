@@ -1,11 +1,31 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
 #include "csp.h"
 #include "dat.h"
 #include "fn.h"
 
+#define dprintf (void)
+
+enum {
+	Qinitsz	= 4,
+	Qgrow	= 2
+};
+
+typedef struct Tqueue	Tqueue;
+
+struct Tqueue {
+	pthread_cond_t	*a;
+	uint		max;
+	uint		front;
+	uint		rear;
+};
+
 struct _Lock {
+	Tqueue		q;
+	int		held;
+	pthread_t		holder;
 	pthread_mutex_t	l;
 	pthread_mutexattr_t	attr;
 };
@@ -18,6 +38,11 @@ struct _Thread {
 };
 
 static void*	run(void*);
+static int		initqueue(Tqueue*, uint);
+static void	freequeue(Tqueue*);
+static int		enqueue(Tqueue*, pthread_cond_t);
+static int		dequeue(Tqueue*, pthread_cond_t*);
+static void	shovequeue(Tqueue*);
 
 Thread*
 createthread(void (*fn)(void*), void *arg, int stksz)
@@ -33,7 +58,7 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	pthread_attr_init(&at);
 	if(stksz > 0){
 		if(pthread_attr_setstacksize(&at, stksz) != 0)
-			errorf("createthread -- specified stack size too small (%u)\n", stksz);
+			errorf("createthread -- given stack size too small (%u)\n", stksz);
 	}
 	pthread_attr_setdetachstate(&at, PTHREAD_CREATE_JOINABLE);
 	t->fn = fn;
@@ -68,10 +93,16 @@ createlock(void)
 	lok = malloc(sizeof *lok);
 	if(lok == nil)
 		return nil;
-	if(pthread_mutexattr_init(&at) != 0)
+	if(initqueue(&lok->q, Qinitsz) != 0)
 		return nil;
-	if(pthread_mutex_init(&l, &at) != 0)
+	if(pthread_mutexattr_init(&at) != 0){
+		freequeue(&lok->q);
 		return nil;
+	}
+	if(pthread_mutex_init(&l, &at) != 0){
+		freequeue(&lok->q);
+		return nil;
+	}
 	lok->l = l;
 	lok->attr = at;
 	return lok;
@@ -80,28 +111,74 @@ createlock(void)
 int
 initlock(Lock *l)
 {
+	initqueue(&l->q, Qinitsz);
 	return pthread_mutex_init(&l->l, nil);
 }
 
 int
 destroylock(Lock *l)
 {
+	freequeue(&l->q);
 	return pthread_mutex_destroy(&l->l);
 }
 
+/* 
+ * This is probably worthless in the face of contention.
+ * Probably worse than blocking alone.
+ */
 int
 lock(Lock *l, int blocking)
 {
-	if(blocking)
-		return pthread_mutex_lock(&l->l);
-	else
-		return pthread_mutex_trylock(&l->l);
+	pthread_cond_t wait;
+
+	pthread_mutex_lock(&l->l);
+	if(!l->held){
+		dprintf("lock: !%p->held; lock\n", l);
+		l->held = 1;
+		l->holder = pthread_self();
+		pthread_mutex_unlock(&l->l);
+		return 1;
+	}else{
+		dprintf("lock: %p held by %p; wait\n", l, &l->holder);
+		pthread_cond_init(&wait, nil);
+		enqueue(&l->q, wait);
+		if(!blocking){
+			dprintf("lock: %p no block\n", l);
+			return 0;
+		}
+		dprintf("lock: %p cond block\n", l);
+		pthread_cond_wait(&wait, &l->l);
+
+		dprintf("lock: %p cond wake\n", l);
+		pthread_cond_destroy(&wait);
+		l->holder = pthread_self();
+		pthread_mutex_unlock(&l->l);
+		return 1;
+	}
 }
 
 int
 unlock(Lock *l)
 {
-	return pthread_mutex_unlock(&l->l);
+	pthread_cond_t waiter;
+
+	pthread_mutex_lock(&l->l);
+	if(!pthread_equal(l->holder, pthread_self())){
+		errorf("unlock -- called by alien thread\n");
+		return -1;
+	}
+	if(!dequeue(&l->q, &waiter)){
+		dprintf("unlock: %p none queued; unlock\n", l);
+		l->held = 0;
+		pthread_mutex_unlock(&l->l);
+		return 0;
+	}else{
+		dprintf("unlock: %p has queue; signal\n", l);
+		pthread_mutex_unlock(&l->l);	/* waiter wants that lock */
+		pthread_cond_signal(&waiter);
+		dprintf("unlock: %p has queue; exchanged\n", l);
+		return 1;
+	}
 }
 
 /*
@@ -117,4 +194,61 @@ run(void *arg)
 	t = (Thread*)arg;
 	t->fn(t->arg);
 	return nil;
+}
+
+static int
+initqueue(Tqueue *q, uint nel)
+{
+	q->a = malloc(nel * sizeof(pthread_t));
+	if(q->a == nil)
+		return -1;
+	q->max = nel;
+	q->front = 0;
+	q->rear = 0;
+	return 0;
+}
+
+static void
+freequeue(Tqueue *q)
+{
+	if(q == nil)
+		return;
+	free(q->a);
+	memset(q, 0, sizeof(Tqueue));
+}
+
+static void
+shovequeue(Tqueue *q)
+{
+	memmove(q->a, q->a+q->front, q->rear-q->front);
+	q->rear -= q->front;
+	q->front = 0;
+}
+
+static int
+enqueue(Tqueue *q, pthread_cond_t t)
+{
+	pthread_cond_t *p;
+
+	if(q == nil)
+		return -1;
+	if(q->rear >= q->max){
+		q->max *= Qgrow;
+		p = realloc(q->a, q->max * sizeof(pthread_cond_t));
+		if(p == nil)
+			return -1;
+		q->a = p;
+		shovequeue(q);
+	}
+	q->a[++q->rear] = t;
+	return q->rear;
+}
+
+static int
+dequeue(Tqueue *q, pthread_cond_t *out)
+{
+	if(q->front >= q->rear)
+		return 0;	/* empty */
+	*out = q->a[++q->front];
+	return 1;
 }
