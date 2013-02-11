@@ -15,17 +15,17 @@ _send(Chan *c, void *p, int blocking)
 	lock(c->l, 1);
 	if(blocking){
 		while(c->n >= c->sz){
-			printf("chansend -- buf full, wait\n");
+			dprintf("chansend -- buf full, wait\n");
 			wait(c->flushed, c->l);
 		}
 	}else{
 		if(c->n >= c->sz){
-			printf("chansend -- buf full, return\n");
+			dprintf("chansend -- buf full, return\n");
 			unlock(c->l);
 			return 0;
 		}
 	}
-	printf("chansend -- proceed\n");
+	dprintf("chansend -- proceed\n");
 	bp = (c->b + c->elsz * ((c->s + c->n) % c->sz));
 	if(p == nil){
 		/* send zeroes */
@@ -37,7 +37,7 @@ _send(Chan *c, void *p, int blocking)
 	}
 	c->n++;
 	if(c->n >= c->sz){
-		printf("chansend -- buf full, signal\n");
+		dprintf("chansend -- buf full, signal\n");
 		signal(c->full);
 	}
 	unlock(c->l);
@@ -60,17 +60,17 @@ _recv(Chan *c, void *p, int blocking)
 	lock(c->l, 1);
 	if(blocking){
 		while(c->n < c->sz){
-			printf("recv -- wait\n");
+			dprintf("recv -- wait\n");
 			wait(c->full, c->l);
 		}
 	}else{
 		if(c->n < c->sz){
-			printf("recv -- return\n");
+			dprintf("recv -- return\n");
 			unlock(c->l);
 			return 0;
 		}
 	}
-	printf("chanrecv -- proceed\n");
+	dprintf("chanrecv -- proceed\n");
 	bp = (c->b + c->elsz * (c->s % c->sz));
 	memmove(p, bp, c->elsz);
 	c->n--;

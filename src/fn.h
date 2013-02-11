@@ -1,3 +1,5 @@
+#define dprintf	errorf
+
 /* sendrecv.c */
 int	_send(Chan*, void*, int);
 int	_recv(Chan*, void*, int);
