@@ -1,3 +1,7 @@
+/* sendrecv.c */
+int	_send(Chan*, void*, int);
+int	_recv(Chan*, void*, int);
+
 /* util.c */
 void	errorf(const char*, ...);
 void*	emalloc(size_t);
