@@ -18,18 +18,18 @@ _send(Chan *c, void *p, int blocking)
 			/* Unbuffered case */
 			while(c->n != -1){
 				dprintf("send -- unbuf wait for recv\n");
-				wait(c->flushed, c->l);
+				wait(c->avail, c->l);
 			}
 			dprintf("send -- unbuf proceed\n");
 			memmove(c->b, p, c->elsz);
 			c->n = 1;
-			signal(c->full);
+			signal(c->avail);
 			unlock(c->l);
 			return 1;
 		}
 		while(c->n >= c->sz){
 			dprintf("send -- buf full, wait\n");
-			wait(c->flushed, c->l);
+			wait(c->avail, c->l);
 		}
 		dprintf("send -- buf proceed\n");
 	}else{
@@ -43,7 +43,7 @@ _send(Chan *c, void *p, int blocking)
 			dprintf("send -- nb unbuf proceed\n");
 			memmove(c->b, p, c->elsz);
 			c->n = 1;
-			signal(c->full);
+			signal(c->avail);
 			unlock(c->l);
 			return 1;
 		}
@@ -64,10 +64,8 @@ _send(Chan *c, void *p, int blocking)
 		nsent = 1;
 	}
 	c->n++;
-	if(c->n >= c->sz){
-		dprintf("chansend -- buf full, signal\n");
-		signal(c->full);
-	}
+	dprintf("send -- signal\n");
+	signal(c->avail);
 	unlock(c->l);
 	return nsent;
 }
@@ -91,21 +89,21 @@ _recv(Chan *c, void *p, int blocking)
 		if(c->sz == 0){
 			/* Unbuffered case */
 			c->n = -1;
-			signal(c->flushed);
+			signal(c->avail);
 			while(c->n != 1){
 				dprintf("recv -- unbuf wait for send\n");
-				wait(c->full, c->l);
+				wait(c->avail, c->l);
 			}
 			dprintf("recv -- unbuf proceed\n");
 			memmove(p, c->b, c->elsz);
-			signal(c->flushed);
+			signal(c->avail);
 			unlock(c->l);
 			return 1;
 		}
 		/* Buffered case */
-		while(c->n < c->sz){
+		while(c->n < 1){
 			dprintf("recv -- buf wait\n");
-			wait(c->full, c->l);
+			wait(c->avail, c->l);
 		}
 		dprintf("chanrecv -- buf proceed\n");
 	}else{
@@ -117,11 +115,11 @@ _recv(Chan *c, void *p, int blocking)
 			}
 			dprintf("chanrecv -- nb unbuf proceed\n");
 			memmove(p, c->b, c->elsz);
-			signal(c->flushed);
+			signal(c->avail);
 			return 1;
 		}
 		/* Buffered case */
-		if(c->n < c->sz){
+		if(c->n < 1){
 			dprintf("recv -- nb buf return\n");
 			unlock(c->l);
 			return 0;
@@ -132,7 +130,7 @@ _recv(Chan *c, void *p, int blocking)
 	memmove(p, bp, c->elsz);
 	c->n--;
 	c->s++;
-	signal(c->flushed);
+	signal(c->avail);
 	unlock(c->l);
 	return 1;
 }

@@ -7,8 +7,7 @@ typedef struct _Cond	Cond;
 
 struct Chan {
 	Lock*	l;
-	Cond*	full;		/* n == sz */
-	Cond*	flushed;	/* n == 0 */
+	Cond*	avail;	/* data became available OR  space became available */
 	unsigned char*	b;	/* the buffer */
 	int	elsz;	/* size of elems in buf */
 	int	sz;	/* sz*elsz == sizeof b */
