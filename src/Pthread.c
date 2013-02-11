@@ -1,7 +1,8 @@
+#include <pthread.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
+#include <sys/time.h>
 #include "csp.h"
 #include "dat.h"
 #include "fn.h"
