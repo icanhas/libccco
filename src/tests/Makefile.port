@@ -1,4 +1,4 @@
-libs=-lhoares ${platlibs}
+libs=-lhoares ${platlibs} -lm
 b=${bin}
 
 all: $b/1$E $b/2$E
