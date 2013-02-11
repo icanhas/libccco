@@ -153,6 +153,22 @@ signal(Cond *c)
 	return pthread_cond_signal(&c->c);
 }
 
+void
+_procsleep(long dur)
+{
+	pthread_mutex_t l = PTHREAD_MUTEX_INITIALIZER;
+	pthread_cond_t c = PTHREAD_COND_INITIALIZER;
+	struct timespec wait, now;
+	
+	gettimeofday(&now, nil);
+	wait.tv_sec = now.tv_sec + dur;
+	wait.tv_nsec = now.tv_nsec;
+	
+	pthread_mutex_lock(&l);
+	pthread_cond_timedwait(&c, &l, &wait);
+	pthread_mutex_unlock(&l);
+}
+
 /*
  * pthread_create takes its fn parameter as void *(*)(void*), so
  * Thread->fn itself cannot be passed to it.  This has the proper

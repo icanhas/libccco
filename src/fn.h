@@ -22,3 +22,4 @@ int	initcond(Cond*);
 int	destroycond(Cond*);
 int	wait(Cond*, Lock*);
 int	signal(Cond*);
+void	_procsleep(long);

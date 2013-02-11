@@ -8,6 +8,7 @@ ofiles= \
   procfree.$O \
   procinit.$O \
   prockill.$O \
+  procsleep.$O \
   sendrecv.$O \
   chancreate.$O \
   chanrecv.$O \
