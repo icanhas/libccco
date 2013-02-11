@@ -7,13 +7,13 @@ typedef struct _Cond	Cond;
 
 struct Chan {
 	Lock*	l;
-	Cond*	full;	/* when nel == max-1, this is signaled */
-	Cond*	flushed;
-	int	isfull;
-	int	elsz;	/* size of elems in buffer */
-	int	max;	/* sizeof b = elsz * max */
-	int	nel;	/* no. elems in buffer */
-	char*	b;	/* the buffer */
+	Cond*	full;		/* n == sz */
+	Cond*	flushed;	/* n == 0 */
+	unsigned char*	b;	/* the buffer */
+	int	elsz;	/* size of elems in buf */
+	int	sz;	/* sz*elsz == sizeof b */
+	int	s;	/* start */
+	int	n;	/* no. elems in buf */
 };
 
 struct Alt {

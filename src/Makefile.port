@@ -10,7 +10,9 @@ ofiles= \
   prockill.$O \
   chancreate.$O \
   chanrecv.$O \
+  channbrecv.$O \
   chansend.$O \
+  channbsend.$O \
   util.$O
 
 all: ${libpath}

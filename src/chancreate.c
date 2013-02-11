@@ -40,10 +40,10 @@ chancreate(int nel, int elsz)
 	c->l = l;
 	c->full = full;
 	c->flushed = flushed;
-	c->isfull = 0;
 	c->elsz = elsz;
-	c->max = nel;
-	c->nel = 0;
+	c->sz = nel;
+	c->n = 0;
+	c->s = 0;
 	c->b = malloc(nel * elsz);
 	return c;
 }
