@@ -1,7 +1,7 @@
 ver=0.0.1
-libmkargs=CC=${CC} O=$O A=$A inc=-I../include \
+libmkargs=CC=${CC} CFLAGS=${CFLAGS} O=$O A=$A inc=-I../include \
   host=${host} FORCE_PTHREAD=${FORCE_PTHREAD} ver=${ver}
-testmkargs=CC=${CC} E=$E O=$O A=$A inc=-I../ bin=../../bin \
+testmkargs=CC=${CC} CFLAGS=${CFLAGS} E=$E O=$O A=$A inc=-I../ bin=../../bin \
   host=${host} FORCE_PTHREAD=${FORCE_PTHREAD}
 
 all: mkdirs thelib
