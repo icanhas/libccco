@@ -6,7 +6,7 @@ int	_recv(Chan*, void*, int);
 
 /* util.c */
 void	errorf(const char*, ...);
-void*	emalloc(size_t);
+void*	emalloc();
 
 /*
  * Platform-dependent things

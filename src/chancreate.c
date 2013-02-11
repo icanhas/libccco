@@ -10,7 +10,7 @@ chancreate(int nel, int elsz)
 	Chan *c;
 	Lock *l;
 	Cond *avail;
-	char *buf;
+	uchar *buf;
 	
 	c = malloc(sizeof *c);
 	if(c == nil){

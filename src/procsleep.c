@@ -5,5 +5,5 @@
 void
 procsleep(long dur)
 {
-	return _procsleep(dur);
+	_procsleep(dur);
 }
