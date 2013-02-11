@@ -14,21 +14,49 @@ _send(Chan *c, void *p, int blocking)
 
 	lock(c->l, 1);
 	if(blocking){
+		if(c->sz == 0){
+			/* Unbuffered case */
+			while(c->n != -1){
+				dprintf("send -- unbuf wait for recv\n");
+				wait(c->flushed, c->l);
+			}
+			dprintf("send -- unbuf proceed\n");
+			memmove(c->b, p, c->elsz);
+			c->n = 1;
+			signal(c->full);
+			unlock(c->l);
+			return 1;
+		}
 		while(c->n >= c->sz){
-			dprintf("chansend -- buf full, wait\n");
+			dprintf("send -- buf full, wait\n");
 			wait(c->flushed, c->l);
 		}
+		dprintf("send -- buf proceed\n");
 	}else{
+		if(c->sz == 0){
+			/* Unbuffered case */
+			if(c->n != -1){
+				dprintf("send -- nb unbuf no recv, return\n");
+				unlock(c->l);
+				return 0;
+			}
+			dprintf("send -- nb unbuf proceed\n");
+			memmove(c->b, p, c->elsz);
+			c->n = 1;
+			signal(c->full);
+			unlock(c->l);
+			return 1;
+		}
+		/* Buffered case */
 		if(c->n >= c->sz){
-			dprintf("chansend -- buf full, return\n");
+			dprintf("chansend -- nb buf full, return\n");
 			unlock(c->l);
 			return 0;
 		}
+		dprintf("send -- nb buf proceed\n");
 	}
-	dprintf("chansend -- proceed\n");
 	bp = (c->b + c->elsz * ((c->s + c->n) % c->sz));
 	if(p == nil){
-		/* send zeroes */
 		memset(bp, 0, c->elsz);
 		nsent = 0;
 	}else{
@@ -50,27 +78,56 @@ _recv(Chan *c, void *p, int blocking)
 	uchar *bp;
 	
 	if(c == nil){
-		errorf("recv -- called on nil Chan\n");
+		errorf("recv -- nil Chan\n");
 		return -1;
 	}
 	if(p == nil){
-		errorf("recv -- given nil receiving buffer\n");
+		errorf("recv -- nil receiving buffer\n");
 		return -1;
 	}
+
 	lock(c->l, 1);
 	if(blocking){
+		if(c->sz == 0){
+			/* Unbuffered case */
+			c->n = -1;
+			signal(c->flushed);
+			while(c->n != 1){
+				dprintf("recv -- unbuf wait for send\n");
+				wait(c->full, c->l);
+			}
+			dprintf("recv -- unbuf proceed\n");
+			memmove(p, c->b, c->elsz);
+			signal(c->flushed);
+			unlock(c->l);
+			return 1;
+		}
+		/* Buffered case */
 		while(c->n < c->sz){
-			dprintf("recv -- wait\n");
+			dprintf("recv -- buf wait\n");
 			wait(c->full, c->l);
 		}
+		dprintf("chanrecv -- buf proceed\n");
 	}else{
+		if(c->sz == 0){
+			/* Unbuffered case */
+			if(c->n < 1){
+				dprintf("recv -- nb unbuf return\n");
+				return 0;
+			}
+			dprintf("chanrecv -- nb unbuf proceed\n");
+			memmove(p, c->b, c->elsz);
+			signal(c->flushed);
+			return 1;
+		}
+		/* Buffered case */
 		if(c->n < c->sz){
-			dprintf("recv -- return\n");
+			dprintf("recv -- nb buf return\n");
 			unlock(c->l);
 			return 0;
 		}
+		dprintf("chanrecv -- nb buf proceed\n");
 	}
-	dprintf("chanrecv -- proceed\n");
 	bp = (c->b + c->elsz * (c->s % c->sz));
 	memmove(p, bp, c->elsz);
 	c->n--;

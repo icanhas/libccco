@@ -1,4 +1,4 @@
-ver=0.0.2
+ver=0.0.3
 libmkargs=CC=${CC} CFLAGS=${CFLAGS} O=$O A=$A inc=-I../include \
   host=${host} FORCE_PTHREAD=${FORCE_PTHREAD} ver=${ver}
 testmkargs=CC=${CC} CFLAGS=${CFLAGS} E=$E O=$O A=$A inc=-I../ bin=../../bin \
