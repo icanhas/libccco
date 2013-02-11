@@ -63,6 +63,12 @@ freethread(Thread *t)
 	free(t);
 }
 
+void
+exitthread(void)
+{
+	pthread_exit(nil);
+}
+
 Lock*
 createlock(void)
 {

@@ -30,6 +30,7 @@ void	procfree(Proc*);
 int	procinit(Proc*, void (*)(void*), void*, int);
 void	prockill(Proc*);
 void	procsleep(long);
+void	procexit(void);
 Chan*	chancreate(int, int);
 void	chanfree(Chan*);
 void	chanalt(Alt*);

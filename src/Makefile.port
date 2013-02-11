@@ -9,6 +9,7 @@ ofiles= \
   procinit.$O \
   prockill.$O \
   procsleep.$O \
+  procexit.$O \
   sendrecv.$O \
   chancreate.$O \
   chanrecv.$O \
