@@ -238,6 +238,7 @@ run(void *arg)
 		wait(&t->wake, &fake);
 	}
 	unlock(&fake);
+	destroylock(&fake);
 	dprintf("run -- thread %p starts\n", t);
 	t->fn(t->arg);
 	return nil;
