@@ -80,10 +80,14 @@ createlock(void)
 	lok = malloc(sizeof *lok);
 	if(lok == nil)
 		return nil;
-	if(pthread_mutexattr_init(&at) != 0)
+	if(pthread_mutexattr_init(&at) != 0){
+		free(lok);
 		return nil;
-	if(pthread_mutex_init(&l, &at) != 0)
+	}
+	if(pthread_mutex_init(&l, &at) != 0){
+		free(lok);
 		return nil;
+	}
 	lok->l = l;
 	lok->attr = at;
 	return lok;
@@ -175,6 +179,7 @@ int
 wait(Cond *c, Lock *l)
 {
 	assert(c != nil);
+	assert(l != nil);
 	return pthread_cond_wait(&c->c, &l->l);
 }
 
