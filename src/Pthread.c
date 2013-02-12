@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <assert.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,8 +58,7 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 void
 freethread(Thread *t)
 {
-	if(t == nil)
-		return;
+	assert(t != nil);
 	pthread_detach(t->t);
 	pthread_attr_destroy(&t->attr);
 	free(t);
@@ -89,21 +89,33 @@ createlock(void)
 	return lok;
 }
 
-int
-initlock(Lock *l)
+void
+freelock(Lock *l)
 {
-	return pthread_mutex_init(&l->l, nil);
+	assert(l != nil);
+	destroylock(l);
+	free(l);
 }
 
 int
+initlock(Lock *l)
+{
+	assert(l != nil);
+	return pthread_mutex_init(&l->l, nil);
+}
+
+void
 destroylock(Lock *l)
 {
-	return pthread_mutex_destroy(&l->l);
+	assert(l != nil);
+	(void)pthread_mutex_destroy(&l->l);
+	(void)pthread_mutexattr_destroy(&l->attr);
 }
 
 int
 lock(Lock *l, int blocking)
 {
+	assert(l != nil);
 	if(blocking)
 		return pthread_mutex_lock(&l->l);
 	else
@@ -113,6 +125,7 @@ lock(Lock *l, int blocking)
 int
 unlock(Lock *l)
 {
+	assert(l != nil);
 	return pthread_mutex_unlock(&l->l);
 }
 
@@ -132,9 +145,18 @@ createcond(void)
 	return p;
 }
 
+void
+freecond(Cond *c)
+{
+	assert(c != nil);
+	destroycond(c);
+	free(c);
+}
+
 int
 initcond(Cond *c)
 {
+	assert(c != nil);
 	if(pthread_cond_init(&c->c, nil) != 0){
 		errorf("initcond -- pthread_cond_init failed\n");
 		return -1;
@@ -142,21 +164,24 @@ initcond(Cond *c)
 	return 0;
 }
 
-int
+void
 destroycond(Cond *c)
 {
-	return pthread_cond_destroy(&c->c);
+	assert(c != nil);
+	(void)pthread_cond_destroy(&c->c);
 }
 
 int
 wait(Cond *c, Lock *l)
 {
+	assert(c != nil);
 	return pthread_cond_wait(&c->c, &l->l);
 }
 
 int
 signal(Cond *c)
 {
+	assert(c != nil);
 	return pthread_cond_signal(&c->c);
 }
 
