@@ -165,11 +165,12 @@ _procsleep(long dur)
 {
 	pthread_mutex_t l = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t c = PTHREAD_COND_INITIALIZER;
-	struct timespec wait, now;
+	struct timeval now;
+	struct timespec wait;
 	
 	gettimeofday(&now, nil);
 	wait.tv_sec = now.tv_sec + dur;
-	wait.tv_nsec = now.tv_nsec;
+	wait.tv_nsec = now.tv_usec * 1000;
 	
 	pthread_mutex_lock(&l);
 	pthread_cond_timedwait(&c, &l, &wait);
