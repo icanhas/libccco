@@ -22,6 +22,8 @@ struct _Thread {
 	void*	arg;		/* proc args */
 	pthread_t		t;
 	pthread_attr_t	attr;
+	Cond	wake;	/* thread starts when wake && running */
+	int	running;
 };
 
 static void*	run(void*);
@@ -30,6 +32,7 @@ Thread*
 createthread(void (*fn)(void*), void *arg, int stksz)
 {
 	Thread *t;
+	Cond wake;
 	pthread_attr_t at;
 	pthread_t p;
 	
@@ -37,6 +40,10 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	if(t == nil)
 		return nil;
 
+	if(initcond(&wake) != 0){
+		free(t);
+		return nil;
+	}
 	pthread_attr_init(&at);
 	if(stksz > 0){
 		if(pthread_attr_setstacksize(&at, stksz) != 0)
@@ -45,6 +52,8 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	pthread_attr_setdetachstate(&at, PTHREAD_CREATE_JOINABLE);
 	t->fn = fn;
 	t->arg = arg;
+	t->wake = wake;
+	t->running = 0;
 	if(pthread_create(&p, &at, run, t) != 0){
 		errorf("createthread -- pthread_create failed\n");
 		free(t);
@@ -52,6 +61,8 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	}
 	t->t = p;
 	t->attr = at;
+	t->running = 1;
+	signal(&t->wake);
 	return t;
 }
 	
@@ -59,6 +70,7 @@ void
 freethread(Thread *t)
 {
 	assert(t != nil);
+	destroycond(&t->wake);
 	pthread_detach(t->t);
 	pthread_attr_destroy(&t->attr);
 	free(t);
@@ -216,8 +228,17 @@ static void*
 run(void *arg)
 {
 	Thread *t;
+	Lock fake;
 	
+	initlock(&fake);
 	t = (Thread*)arg;
+	lock(&fake, 1);
+	while(!t->running){
+		dprintf("run -- wait\n");
+		wait(&t->wake, &fake);
+	}
+	unlock(&fake);
+	dprintf("run -- thread %p starts\n", t);
 	t->fn(t->arg);
 	return nil;
 }
