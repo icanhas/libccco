@@ -1,4 +1,4 @@
-name=libhoares
+name=libcsp
 libname=${name}.$A
 libpath=../lib/${libname}
 

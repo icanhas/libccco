@@ -35,6 +35,6 @@ distfiles = \
 
 dist: clean
 	tar cf tmp.tar ${distfiles}
-	gzip <tmp.tar >libhoares-${ver}.tar.gz
-	bzip2 <tmp.tar >libhoares-${ver}.tar.bz2
+	gzip <tmp.tar >libcsp-${ver}.tar.gz
+	bzip2 <tmp.tar >libcsp-${ver}.tar.bz2
 	rm tmp.tar
