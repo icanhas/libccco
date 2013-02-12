@@ -1,16 +1,21 @@
 #define dprintf	errorf
 
-/* sendrecv.c */
+/* 
+ * sendrecv.c 
+ */
 int	_send(Chan*, void*, int);
 int	_recv(Chan*, void*, int);
 
-/* util.c */
+/* 
+ * util.c 
+ */
 void	errorf(const char*, ...);
 void*	emalloc();
 
 /*
- * Platform-dependent things
- * (Win|Pthread).c
+ * Platform-dependent parts
+ * Pthread.c
+ * Win.c
  */
 Thread*	createthread(void (*)(void*), void*, int);
 void	freethread(Thread*);
