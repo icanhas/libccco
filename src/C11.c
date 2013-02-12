@@ -1,3 +1,8 @@
+#include <assert.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/time.h>
 #include <threads.h>
 #include "csp.h"
 #include "dat.h"
@@ -215,10 +220,17 @@ static int
 run(void *arg)
 {
 	Thread *t;
+	Lock fake;
 	
+	initlock(&fake);
 	t = arg;
-	while(!t->running)
-		wait(&t->wake);
+	while(!t->running){
+		dprintf("thread suspend\n");
+		wait(&t->wake, &fake);
+	}
+	unlock(&fake);
+	destroylock(&fake);
+	dprintf("thread &p starts\n", t);
 	t->fn(t->arg);
 	return 0;
 }
