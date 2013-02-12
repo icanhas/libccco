@@ -12,6 +12,7 @@ ofiles= \
   procexit.$O \
   sendrecv.$O \
   chancreate.$O \
+  chanfree.$O \
   chanrecv.$O \
   channbrecv.$O \
   chansend.$O \
