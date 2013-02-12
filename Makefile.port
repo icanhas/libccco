@@ -25,9 +25,16 @@ clean:
 	
 nuke:
 	cd src && make nuke ${libmkargs}
+	
+distfiles = \
+   LICENSE \
+   Makefile.port \
+   GNUmakefile \
+   include \
+   src
 
 dist: clean
-	tar cf tmp.tar Makefile.port GNUmakefile include src
+	tar cf tmp.tar ${distfiles}
 	gzip <tmp.tar >libhoares-${ver}.tar.gz
 	bzip2 <tmp.tar >libhoares-${ver}.tar.bz2
 	rm tmp.tar
