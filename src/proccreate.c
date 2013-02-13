@@ -18,6 +18,7 @@ proccreate(void (*fn)(void*), void *arg, int stksz)
 	t = createthread(fn, arg, stksz);
 	if(t == nil){
 		errorf("proccreate -- could not create thread\n");
+		free(p);
 		return nil;
 	}
 	p->t = t;
