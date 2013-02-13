@@ -81,6 +81,8 @@ void
 freethread(Thread *t)
 {
 	assert(t != nil);
+	if(t->name != nil)
+		free(t->name);
 	destroycond(&t->wake);
 	pthread_detach(t->t);
 	pthread_attr_destroy(&t->attr);
@@ -254,8 +256,10 @@ _procsleep(long dur)
 
 /*
  * pthread_create takes its fn parameter as void *(*)(void*), so
- * Thread->fn itself cannot be passed to it.  This has the proper
- * signature and wraps Thread->fn.
+ * Thread->fn itself cannot be passed to it.  This has the proper signature
+ * and wraps Thread->fn.  It also initialises thread-local storage and
+ * waits for the Thread structure to be completely filled out before
+ * finally starting the thread's main procedure.
  */
 static void*
 run(void *arg)
