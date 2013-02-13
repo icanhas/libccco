@@ -3,10 +3,10 @@
 /*
  * rand.c
  */
-void	initrand(Rand*, Lock*);
-void	destroyrand(Rand*, Lock*);
-void	_srand(Rand*, ulong, Lock*);
-ulong	_rand(Rand*, Lock*);
+void	initrand(Rand*);
+void	destroyrand(Rand*);
+void	_srand(Rand*, ulong);
+ulong	_rand(Rand*);
 
 /* 
  * sendrecv.c 

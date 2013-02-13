@@ -87,7 +87,7 @@ freethread(Thread *t)
 	destroycond(&t->wake);
 	pthread_detach(t->t);
 	pthread_attr_destroy(&t->attr);
-	destroyrand(&t->r, nil);
+	destroyrand(&t->r);
 	free(t);
 }
 
@@ -263,7 +263,7 @@ _stlrand(ulong seed)
 	
 	t = (Thread*)pthread_getspecific(tlskey);
 	assert(t != nil);
-	_srand(&t->r, seed, nil);
+	_srand(&t->r, seed);
 }
 
 ulong
@@ -273,7 +273,7 @@ _tlrand(void)
 	
 	t = (Thread*)pthread_getspecific(tlskey);
 	assert(t != nil);
-	return _rand(&t->r, nil);
+	return _rand(&t->r);
 }
 
 /*
@@ -296,7 +296,7 @@ run(void *arg)
 	pthread_once(&tlsonce, construct);
 	pthread_setspecific(tlskey, t);
 	
-	initrand(&t->r, nil);
+	initrand(&t->r);
 	
 	lock(&fake, 1);
 	while(!t->running){
@@ -323,5 +323,5 @@ destruct(void *keydata)
 	
 	dprintf("destruct\n");
 	t = (Thread*)keydata;
-	destroyrand(&t->r, nil);
+	destroyrand(&t->r);
 }
