@@ -12,15 +12,15 @@ ofiles= \
   procgetname.$O \
   procsleep.$O \
   procexit.$O \
-  sendrecv.$O \
+  procsrand.$O \
+  procrand.$O \
   chancreate.$O \
   chanfree.$O \
   chanrecv.$O \
   channbrecv.$O \
   chansend.$O \
   channbsend.$O \
-  splrand.$O \
-  plrand.$O \
+  sendrecv.$O \
   rand.$O \
   util.$O
 

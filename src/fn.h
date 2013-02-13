@@ -1,5 +1,13 @@
 #define dprintf	errorf
 
+/*
+ * rand.c
+ */
+void	initrand(Rand*, Lock*);
+void	destroyrand(Rand*, Lock*);
+void	_srand(Rand*, ulong, Lock*);
+ulong	_rand(Rand*, Lock*);
+
 /* 
  * sendrecv.c 
  */
@@ -35,10 +43,6 @@ void	destroycond(Cond*);
 int	wait(Cond*, Lock*);
 int	signal(Cond*);
 void	_procsleep(long);
-void	initrand(Rand*, Lock*);
-void	destroyrand(Rand*, Lock*);
-void	_srand(Rand*, ulong, Lock*);
-ulong	_rand(Rand*, Lock*);
 void	_stlrand(ulong);
 ulong	_tlrand(void);
 

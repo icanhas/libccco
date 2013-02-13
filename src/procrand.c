@@ -2,8 +2,8 @@
 #include "dat.h"
 #include "fn.h"
 
-void
-splrand(ulong seed)
+ulong
+procrand(void)
 {
-	_stlrand(seed);
+	return _tlrand();
 }
