@@ -60,6 +60,7 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 			errorf("createthread -- given stack size too small (%u)\n", stksz);
 	}
 	pthread_attr_setdetachstate(&at, PTHREAD_CREATE_JOINABLE);
+	t->name = nil;
 	t->fn = fn;
 	t->arg = arg;
 	t->wake = wake;
