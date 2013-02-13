@@ -42,3 +42,5 @@ int	chansend(Chan*, void*);
 int	chansendp(Chan*, void*);
 int	channbsend(Chan*, void*);
 int	channbsendp(Chan*, void*);
+void	splrand(unsigned long);
+unsigned long	plrand(void);

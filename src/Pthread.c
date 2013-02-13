@@ -25,6 +25,7 @@ struct _Thread {
 	pthread_attr_t	attr;
 	Cond	wake;	/* thread starts when wake && running */
 	int	running;
+	Rand	r;
 };
 
 /*
@@ -76,7 +77,7 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	signal(&t->wake);
 	return t;
 }
-	
+
 void
 freethread(Thread *t)
 {
@@ -86,6 +87,7 @@ freethread(Thread *t)
 	destroycond(&t->wake);
 	pthread_detach(t->t);
 	pthread_attr_destroy(&t->attr);
+	destroyrand(&t->r, nil);
 	free(t);
 }
 
@@ -254,6 +256,26 @@ _procsleep(long dur)
 	pthread_mutex_unlock(&l);
 }
 
+void
+_stlrand(ulong seed)
+{
+	Thread *t;
+	
+	t = (Thread*)pthread_getspecific(tlskey);
+	assert(t != nil);
+	_srand(&t->r, seed, nil);
+}
+
+ulong
+_tlrand(void)
+{
+	Thread *t;
+	
+	t = (Thread*)pthread_getspecific(tlskey);
+	assert(t != nil);
+	return _rand(&t->r, nil);
+}
+
 /*
  * pthread_create takes its fn parameter as void *(*)(void*), so
  * Thread->fn itself cannot be passed to it.  This has the proper signature
@@ -273,6 +295,8 @@ run(void *arg)
 
 	pthread_once(&tlsonce, construct);
 	pthread_setspecific(tlskey, t);
+	
+	initrand(&t->r, nil);
 	
 	lock(&fake, 1);
 	while(!t->running){
@@ -294,6 +318,10 @@ construct(void)
 
 static void
 destruct(void *keydata)
-{
+{	
+	Thread *t;
+	
 	dprintf("destruct\n");
+	t = (Thread*)keydata;
+	destroyrand(&t->r, nil);
 }

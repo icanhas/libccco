@@ -19,6 +19,9 @@ ofiles= \
   channbrecv.$O \
   chansend.$O \
   channbsend.$O \
+  splrand.$O \
+  plrand.$O \
+  rand.$O \
   util.$O
 
 all: ${libpath}
