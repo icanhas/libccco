@@ -8,6 +8,8 @@ ofiles= \
   procfree.$O \
   procinit.$O \
   prockill.$O \
+  procsetname.$O \
+  procgetname.$O \
   procsleep.$O \
   procexit.$O \
   sendrecv.$O \

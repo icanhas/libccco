@@ -21,13 +21,14 @@ struct Alt {
 
 struct Proc {
 	Thread*	t;
-	char*	name;
 };
 
 Proc*	proccreate(void (*)(void*), void*, int);
 void	procfree(Proc*);
 int	procinit(Proc*, void (*)(void*), void*, int);
 void	prockill(Proc*);
+void	procsetname(const char*, ...);
+char*	procgetname(void);
 void	procsleep(long);
 void	procexit(void);
 Chan*	chancreate(int, int);

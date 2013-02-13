@@ -18,6 +18,7 @@ struct _Cond {
 };
 
 struct _Thread {
+	char*	name;
 	void	(*fn)(void*);	/* proc 'main' */
 	void*	arg;		/* proc args */
 	pthread_t		t;
@@ -26,7 +27,16 @@ struct _Thread {
 	int	running;
 };
 
+/*
+ * These two are for thread-local storage.  A thread can call for a 
+ * pointer to its own Thread structure.
+ */
+static pthread_key_t	tlskey;
+static pthread_once_t	tlsonce = PTHREAD_ONCE_INIT;
+
 static void*	run(void*);
+static void	construct(void);
+static void	destruct(void*);
 
 Thread*
 createthread(void (*fn)(void*), void *arg, int stksz)
@@ -80,6 +90,28 @@ void
 exitthread(void)
 {
 	pthread_exit(nil);
+}
+
+void
+setthreadname(const char *name)
+{
+	Thread *t;
+	
+	t = (Thread*)pthread_getspecific(tlskey);
+	assert(t != nil);
+	if(t->name != nil)
+		free(t->name);
+	t->name = malloc(strlen(name)+1);
+	strcpy(t->name, name);
+}
+
+char*
+getthreadname(void)
+{
+	Thread *t;
+	
+	t = (Thread*)pthread_getspecific(tlskey);
+	return t->name;
 }
 
 Lock*
@@ -231,15 +263,32 @@ run(void *arg)
 	Lock fake;
 	
 	initlock(&fake);
+	
 	t = (Thread*)arg;
+
+	pthread_once(&tlsonce, construct);
+	pthread_setspecific(tlskey, t);
+	
 	lock(&fake, 1);
 	while(!t->running){
-		dprintf("run -- wait\n");
+		dprintf("thread suspend\n");
 		wait(&t->wake, &fake);
 	}
 	unlock(&fake);
 	destroylock(&fake);
-	dprintf("run -- thread %p starts\n", t);
+	dprintf("thread %p starts\n", t);
 	t->fn(t->arg);
 	return nil;
+}
+
+static void
+construct(void)
+{
+	pthread_key_create(&tlskey, destruct);
+}
+
+static void
+destruct(void *keydata)
+{
+	dprintf("destruct\n");
 }

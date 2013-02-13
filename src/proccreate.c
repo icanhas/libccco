@@ -21,6 +21,5 @@ proccreate(void (*fn)(void*), void *arg, int stksz)
 		return nil;
 	}
 	p->t = t;
-	p->name = "<name>";
 	return p;
 }

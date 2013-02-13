@@ -20,6 +20,8 @@ void*	emalloc();
 Thread*	createthread(void (*)(void*), void*, int);
 void	freethread(Thread*);
 void	exitthread();
+void	setthreadname(const char*);
+char*	getthreadname(void);
 Lock*	createlock(void);
 void	freelock(Lock*);
 int	initlock(Lock*);

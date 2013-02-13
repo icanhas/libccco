@@ -15,6 +15,5 @@ procinit(Proc *p, void (*fn)(void*), void *arg, int stksz)
 		return -1;
 	}
 	p->t = t;
-	p->name = "<name>";
 	return 0;
 }
