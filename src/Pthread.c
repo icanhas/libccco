@@ -116,6 +116,7 @@ getthreadname(void)
 	Thread *t;
 	
 	t = (Thread*)pthread_getspecific(tlskey);
+	assert(t != nil);
 	return t->name;
 }
 
