@@ -73,12 +73,12 @@ usend(Chan *c, void *p)
 {
 	while(c->n != -1){
 		dprintf("send -- unbuf wait for recv\n");
-		wait(c->avail, c->l);
+		wait(c->sa, c->l);
 	}
 	dprintf("send -- unbuf proceed\n");
 	memmove(c->b, p, c->elsz);
 	c->n = 1;
-	signal(c->avail);
+	signal(c->da);
 	unlock(c->l);
 	return 1;
 }
@@ -94,7 +94,7 @@ bsend(Chan *c, void *p)
 	
 	while(c->n >= c->sz){
 		dprintf("send -- buf full, wait\n");
-		wait(c->avail, c->l);
+		wait(c->sa, c->l);
 	}
 	dprintf("send -- buf proceed\n");
 	bp = (c->b + c->elsz * ((c->s + c->n) % c->sz));
@@ -107,7 +107,7 @@ bsend(Chan *c, void *p)
 	}
 	c->n++;
 	dprintf("send -- signal\n");
-	signal(c->avail);
+	signal(c->da);
 	unlock(c->l);
 	return nsent;
 }
@@ -126,7 +126,7 @@ nbusend(Chan *c, void *p)
 	dprintf("send -- nb unbuf proceed\n");
 	memmove(c->b, p, c->elsz);
 	c->n = 1;
-	signal(c->avail);
+	signal(c->da);
 	unlock(c->l);
 	return 1;
 }
@@ -156,7 +156,7 @@ nbbsend(Chan *c, void *p)
 	}
 	c->n++;
 	dprintf("send -- signal\n");
-	signal(c->avail);
+	signal(c->da);
 	unlock(c->l);
 	return nsent;
 }
@@ -168,14 +168,14 @@ static int
 urecv(Chan *c, void *p)
 {
 	c->n = -1;
-	signal(c->avail);
+	signal(c->sa);
 	while(c->n != 1){
 		dprintf("recv -- unbuf wait for send\n");
-		wait(c->avail, c->l);
+		wait(c->da, c->l);
 	}
 	dprintf("recv -- unbuf proceed\n");
 	memmove(p, c->b, c->elsz);
-	signal(c->avail);
+	signal(c->sa);
 	unlock(c->l);
 	return 1;
 }
@@ -190,14 +190,14 @@ brecv(Chan *c, void *p)
 	
 	while(c->n < 1){
 		dprintf("recv -- buf wait\n");
-		wait(c->avail, c->l);
+		wait(c->da, c->l);
 	}
 	dprintf("recv -- buf proceed\n");
 	bp = (c->b + c->elsz * (c->s % c->sz));
 	memmove(p, bp, c->elsz);
 	c->n--;
 	c->s++;
-	signal(c->avail);
+	signal(c->sa);
 	unlock(c->l);
 	return 1;
 }
@@ -214,7 +214,7 @@ nburecv(Chan *c, void *p)
 	}
 	dprintf("recv -- nb unbuf proceed\n");
 	memmove(p, c->b, c->elsz);
-	signal(c->avail);
+	signal(c->sa);
 	return 1;
 }
 
@@ -236,7 +236,7 @@ nbbrecv(Chan *c, void *p)
 	memmove(p, bp, c->elsz);
 	c->n--;
 	c->s++;
-	signal(c->avail);
+	signal(c->sa);
 	unlock(c->l);
 	return 1;
 }

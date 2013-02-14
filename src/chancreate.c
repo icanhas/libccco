@@ -9,7 +9,7 @@ chancreate(int nel, int elsz)
 {
 	Chan *c;
 	Lock *l;
-	Cond *avail;
+	Cond *da, *sa;
 	uchar *buf;
 	
 	c = malloc(sizeof *c);
@@ -22,10 +22,15 @@ chancreate(int nel, int elsz)
 		errorf("chancreate -- failed to alloc lock\n");
 		goto Freel;
 	}
-	avail = createcond();
-	if(avail == nil){
+	da = createcond();
+	if(da == nil){
 		errorf("chancreate -- createcond failed\n");
 		goto Freec;
+	}
+	sa = createcond();
+	if(sa == nil){
+		errorf("chancreate -- createcond failed\n");
+		goto Freeda;
 	}
 	if(nel > 0)
 		buf = calloc(nel, elsz);
@@ -33,19 +38,21 @@ chancreate(int nel, int elsz)
 		buf = calloc(1, elsz);
 	if(buf == nil){
 		errorf("chancreate -- failed to alloc channel buffer\n");
-		goto Freeavail;
+		goto Freesa;
 	}
 	c->l = l;
-	c->avail = avail;
+	c->da = da;
+	c->sa = sa;
 	c->b = buf;
 	c->elsz = elsz;
 	c->sz = nel;
 	c->n = 0;
 	c->s = 0;
 	return c;
-
-Freeavail:
-	free(avail);
+Freesa:
+	free(sa);
+Freeda:
+	free(da);
 Freel:
 	free(l);
 Freec:
