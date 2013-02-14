@@ -184,7 +184,7 @@ int
 initcond(Cond *c)
 {
 	assert(c != nil);
-	c->c = CreateEvent(NULL, FALSE, FALSE, TEXT("Cond"));
+	c->c = CreateEvent(NULL, TRUE, FALSE, TEXT("Cond"));
 	if(c->c == nil){
 		errorf("initcond -- CreateEvent failed\n");
 		return -1;
@@ -208,6 +208,7 @@ wait(Cond *c, Lock *l)
 	if(WaitForSingleObject(c->c, INFINITE) != WAIT_OBJECT_0)
 		return -1;
 	lock(l, 1);
+	ResetEvent(c->c);
 	return 0;
 }
 
