@@ -1,6 +1,6 @@
 ifeq ($(host),mingw32)
   E=.exe
-  platofiles=Win.$O
+  platofiles=Windows.$O
 else
   platofiles=Pthread.$O
 endif
