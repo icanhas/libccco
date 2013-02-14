@@ -1,7 +1,7 @@
 libs=-lcsp ${platlibs} -lm
 b=${bin}
 
-all: $b/1$E $b/2$E
+all: clean $b/1$E $b/2$E $b/spawnexit$E
 	
 .c.$O:
 	${CC} ${CFLAGS} ${inc} -c -o $@ $<
@@ -12,5 +12,10 @@ $b/1$E: 1.$O
 $b/2$E: 2.$O
 	${CC} ${LDFLAGS} -o $@ $^ ${libs}
 	
+$b/spawnexit$E: spawnexit.$O
+	${CC} ${LDFLAGS} -o $@ $^ ${libs}
+	
 clean:
-	rm -f $b/1$E 1.$O $b/2$E 2.$O
+	rm -f $b/1$E 1.$O \
+		$b/2$E 2.$O \
+		$b/spawnexit$E spawnexit.$O
