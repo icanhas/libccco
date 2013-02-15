@@ -12,8 +12,8 @@ struct Chan {
 	unsigned char*	b;	/* the buffer */
 	int	elsz;	/* size of elems in buf */
 	int	sz;	/* sz*elsz == sizeof b */
-	int	s;	/* start */
-	int	n;	/* no. elems in buf */
+	volatile int	s;	/* start */
+	volatile int	n;	/* no. elems in buf */
 };
 
 struct Alt {
