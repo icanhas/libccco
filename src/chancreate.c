@@ -5,7 +5,7 @@
 #include "fn.h"
 
 Chan*
-chancreate(int nel, int elsz)
+chancreate(long nel, long elsz)
 {
 	Chan *c;
 	Lock *l;

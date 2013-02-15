@@ -6,14 +6,14 @@ typedef struct _Thread	Thread;
 typedef struct _Cond	Cond;
 
 struct Chan {
-	Lock*	l;
-	Cond*	da;	/* data became available in buf */
-	Cond*	sa;	/* recver wants to proceed, or just finished recving */
+	Lock*		l;
+	Cond*		da;	/* data became available in buf */
+	Cond*		sa;	/* recver wants to proceed, or just finished recving */
 	unsigned char*	b;	/* the buffer */
-	int	elsz;	/* size of elems in buf */
-	int	sz;	/* sz*elsz == sizeof b */
-	volatile int	s;	/* start */
-	volatile int	n;	/* no. elems in buf */
+	long		elsz;	/* size of elems in buf */
+	long		sz;	/* sz*elsz == sizeof b */
+	long		s;	/* start */
+	volatile long	n;	/* no. elems in buf */
 };
 
 struct Alt {
@@ -34,7 +34,7 @@ void	procsleep(long);
 void	procexit(void);
 void	procsrand(unsigned long);
 unsigned long	procrand(void);
-Chan*	chancreate(int, int);
+Chan*	chancreate(long, long);
 void	chanfree(Chan*);
 void	chanalt(Alt*);
 int	chanrecv(Chan*, void*);
