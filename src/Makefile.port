@@ -17,8 +17,10 @@ ofiles= \
   chancreate.$O \
   chanfree.$O \
   chanrecv.$O \
+  chanrecvp.$O \
   channbrecv.$O \
   chansend.$O \
+  chansendp.$O \
   channbsend.$O \
   sendrecv.$O \
   rand.$O \
