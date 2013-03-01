@@ -8,19 +8,15 @@ Proc*
 proccreate(void (*fn)(void*), void *arg, int stksz)
 {
 	Proc *p;
-	Thread *t;
 	
 	p = malloc(sizeof *p);
 	if(p == nil){
 		errorf("proccreate -- out of memory\n");
 		return nil;
 	}
-	t = createthread(fn, arg, stksz);
-	if(t == nil){
-		errorf("proccreate -- could not create thread\n");
+	if(procinit(p, fn, arg, 0) != 0){
 		free(p);
 		return nil;
 	}
-	p->t = t;
 	return p;
 }
