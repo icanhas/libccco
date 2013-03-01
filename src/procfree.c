@@ -9,6 +9,6 @@ procfree(Proc *p)
 {
 	if(p == nil)
 		return;
-	freethread(p->t);
+	prockill(p);
 	free(p);
 }
