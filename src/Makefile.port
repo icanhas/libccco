@@ -17,6 +17,7 @@ ofiles= \
   chancreate.$O \
   chanfree.$O \
   chanopen.$O \
+  chanclose.$O \
   chanrecv.$O \
   chanrecvp.$O \
   channbrecv.$O \
