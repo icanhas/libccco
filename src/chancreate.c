@@ -20,12 +20,12 @@ chancreate(long nel, long elsz)
 	l = createlock();
 	if(l == nil){
 		errorf("chancreate -- failed to alloc lock\n");
-		goto Freel;
+		goto Freec;
 	}
 	da = createcond();
 	if(da == nil){
 		errorf("chancreate -- createcond failed\n");
-		goto Freec;
+		goto Freel;
 	}
 	sa = createcond();
 	if(sa == nil){
@@ -46,8 +46,9 @@ chancreate(long nel, long elsz)
 	c->b = buf;
 	c->elsz = elsz;
 	c->sz = nel;
-	c->n = 0;
 	c->s = 0;
+	c->n = 0;
+	c->u = 0;
 	return c;
 Freesa:
 	free(sa);
