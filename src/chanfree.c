@@ -8,12 +8,6 @@ chanfree(Chan *c)
 {
 	if(c == nil)
 		return;
-	lock(c->l, 1);
-	destroycond(c->da);
-	destroycond(c->sa);
-	if(c->b != nil)
-		free(c->b);
-	unlock(c->l);
-	freelock(c->l);
+	chanclose(c);
 	free(c);
 }
