@@ -10,10 +10,11 @@ struct Chan {
 	Cond*		da;	/* data became available in buf */
 	Cond*		sa;	/* recver wants to proceed, or just finished recving */
 	unsigned char*	b;	/* the buffer */
-	long		elsz;	/* size of elems in buf */
+	long		elsz;	/* size of an elem in buf */
 	long		sz;	/* sz*elsz == sizeof b */
 	long		s;	/* start */
 	volatile long	n;	/* no. elems in buf */
+	volatile int	u;	/* used in unbuffered ops only */
 };
 
 struct Alt {

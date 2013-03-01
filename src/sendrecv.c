@@ -3,6 +3,11 @@
 #include "dat.h"
 #include "fn.h"
 
+enum {
+	Snone,
+	Sdone
+};
+
 static int	usend(Chan*, void*);
 static int	bsend(Chan*, void*);
 static int	nbusend(Chan*, void*);
@@ -71,13 +76,14 @@ _recv(Chan *c, void *p, int blocking)
 static int
 usend(Chan *c, void *p)
 {
-	while(c->n != -1){
-		dprintf("send -- unbuf wait for recv\n");
+	c->u = Snone;
+	while(c->n < 1){
+		dprintf("send -- unbuf wait for recver\n");
 		wait(c->sa, c->l);
 	}
 	dprintf("send -- unbuf proceed\n");
 	memmove(c->b, p, c->elsz);
-	c->n = 1;
+	c->u = Sdone;
 	signal(c->da);
 	unlock(c->l);
 	return 1;
@@ -118,14 +124,14 @@ bsend(Chan *c, void *p)
 static int
 nbusend(Chan *c, void *p)
 {
-	if(c->n != -1){
+	if(c->n < 1){
 		dprintf("send -- nb unbuf no recver, return\n");
 		unlock(c->l);
 		return 0;
 	}
 	dprintf("send -- nb unbuf proceed\n");
 	memmove(c->b, p, c->elsz);
-	c->n = 1;
+	c->u = Sdone;
 	signal(c->da);
 	unlock(c->l);
 	return 1;
@@ -167,15 +173,16 @@ nbbsend(Chan *c, void *p)
 static int
 urecv(Chan *c, void *p)
 {
-	c->n = -1;
+	c->n++;
 	signal(c->sa);
-	while(c->n != 1){
-		dprintf("recv -- unbuf wait for send\n");
+	while(c->u != Sdone){
+		dprintf("recv -- unbuf wait for sender\n");
 		wait(c->da, c->l);
 	}
 	dprintf("recv -- unbuf proceed\n");
 	memmove(p, c->b, c->elsz);
-	signal(c->sa);
+	c->n--;
+	c->u = Snone;
 	unlock(c->l);
 	return 1;
 }
@@ -208,13 +215,15 @@ brecv(Chan *c, void *p)
 static int
 nburecv(Chan *c, void *p)
 {
-	if(c->n < 1){
+	if(c->u != Sdone){
 		dprintf("recv -- nb unbuf return\n");
+		unlock(c->l);
 		return 0;
 	}
 	dprintf("recv -- nb unbuf proceed\n");
 	memmove(p, c->b, c->elsz);
 	signal(c->sa);
+	unlock(c->l);
 	return 1;
 }
 
