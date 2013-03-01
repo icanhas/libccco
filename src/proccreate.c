@@ -14,7 +14,7 @@ proccreate(void (*fn)(void*), void *arg, int stksz)
 		errorf("proccreate -- out of memory\n");
 		return nil;
 	}
-	if(procinit(p, fn, arg, 0) != 0){
+	if(procinit(p, fn, arg, stksz) != 0){
 		free(p);
 		return nil;
 	}
