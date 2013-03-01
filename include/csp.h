@@ -37,6 +37,8 @@ void	procsrand(unsigned long);
 unsigned long	procrand(void);
 Chan*	chancreate(long, long);
 void	chanfree(Chan*);
+int	chanopen(Chan*, long, long);
+void	chanclose(Chan*);
 void	chanalt(Alt*);
 int	chanrecv(Chan*, void*);
 void*	chanrecvp(Chan*);

@@ -16,6 +16,7 @@ ofiles= \
   procrand.$O \
   chancreate.$O \
   chanfree.$O \
+  chanopen.$O \
   chanrecv.$O \
   chanrecvp.$O \
   channbrecv.$O \
