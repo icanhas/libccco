@@ -21,9 +21,9 @@ void	errorf(const char*, ...);
 void*	emalloc();
 
 /*
- * Platform-dependent parts
  * Pthread.c
- * Win.c
+ * Windows.c
+ * C11.c
  */
 Thread*	createthread(void (*)(void*), void*, int);
 void	freethread(Thread*);
