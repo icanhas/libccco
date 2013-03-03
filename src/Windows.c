@@ -11,7 +11,9 @@ struct _Lock {
 };
 
 struct _Cond {
-	HANDLE c;
+	HANDLE	c;
+	Lock	lwaiters;
+	long	nwaiters;
 };
 
 struct _Thread {
@@ -24,6 +26,10 @@ struct _Thread {
 	Rand	r;
 };
 
+/*
+ * This is for thread-local storage.  A thread can call for a 
+ * pointer to its own Thread structure.
+ */
 static DWORD	tlsindex = -1;
 
 static DWORD WINAPI	run(void*);
@@ -189,6 +195,12 @@ initcond(Cond *c)
 		errorf("initcond -- CreateEvent failed\n");
 		return -1;
 	}
+	if(initlock(&c->lwaiters) != 0){
+		errorf("initcond -- initlock failed\n");
+		CloseHandle(c->c);
+		return -1;
+	}
+	c->nwaiters = 0;
 	return 0;
 }
 
@@ -204,11 +216,18 @@ wait(Cond *c, Lock *l)
 {
 	assert(c != nil);
 	assert(l != nil);
+	lock(&c->lwaiters, 1);
+	c->nwaiters++;
+	unlock(&c->lwaiters);
 	unlock(l);
-	if(WaitForSingleObject(c->c, INFINITE) != WAIT_OBJECT_0)
-		return -1;
+	while(WaitForSingleObject(c->c, INFINITE) != WAIT_OBJECT_0)
+		;
+	lock(&c->lwaiters, 1);
+	c->nwaiters--;
+	unlock(&c->lwaiters);
+	if(c->nwaiters <= 0)
+		ResetEvent(c->c);
 	lock(l, 1);
-	ResetEvent(c->c);
 	return 0;
 }
 
@@ -216,8 +235,7 @@ int
 signal(Cond *c)
 {
 	assert(c != nil);
-	if(!SetEvent(c->c))
-		return -1;
+	SetEvent(c->c);
 	return 0;
 }
 
@@ -248,7 +266,11 @@ _tlrand(void)
 }
 
 /*
- * This wraps Thread->fn.
+ * CreateThread takes its fn parameter as DWORD WINAPI (*)(void*),
+ * so Thread->fn itself cannot be passed to it.  This has the proper
+ * signature and wraps Thread->fn.  It also initialises thread-local
+ * storage and waits for the Thread structure to be completely filled
+ * out before finally calling the thread's main procedure.
  */
 static DWORD WINAPI
 run(void *arg)
