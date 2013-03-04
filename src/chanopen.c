@@ -7,7 +7,7 @@ int
 chanopen(Chan *c, long nel, long elsz)
 {
 	Lock *l;
-	Cond *da, *sa;
+	Cond *da, *sa, *sc;
 	uchar *buf;
 
 	l = createlock();
@@ -28,12 +28,21 @@ chanopen(Chan *c, long nel, long elsz)
 		freelock(l);
 		return -1;
 	}
+	sc = createcond();
+	if(sc == nil){
+		errorf("chanopen -- createcond failed\n");
+		freecond(sa);
+		freecond(da);
+		freelock(l);
+		return -1;
+	}
 	if(nel > 0)
 		buf = calloc(nel, elsz);
 	else
 		buf = calloc(1, elsz);
 	if(buf == nil){
 		errorf("chanopen -- failed to alloc channel buffer\n");
+		freecond(sc);
 		freecond(sa);
 		freecond(da);
 		freelock(l);
@@ -42,6 +51,7 @@ chanopen(Chan *c, long nel, long elsz)
 	c->l = l;
 	c->da = da;
 	c->sa = sa;
+	c->sc = sc;
 	c->b = buf;
 	c->elsz = elsz;
 	c->sz = nel;

@@ -9,6 +9,7 @@ struct Chan {
 	Lock*		l;
 	Cond*		da;	/* data became available in buf */
 	Cond*		sa;	/* recver wants to proceed, or just finished recving */
+	Cond*		sc;	/* send complete */
 	unsigned char*	b;	/* the buffer */
 	long		elsz;	/* size of an elem in buf */
 	long		sz;	/* sz*elsz == sizeof b */

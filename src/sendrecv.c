@@ -76,15 +76,22 @@ _recv(Chan *c, void *p, int blocking)
 static int
 usend(Chan *c, void *p)
 {
-	c->u = Snone;
+	long n;
+
+	c->u++;
 	while(c->n < 1){
 		dprintf("send -- unbuf wait for recver\n");
 		wait(c->sa, c->l);
 	}
+	n = c->n;
 	dprintf("send -- unbuf proceed\n");
 	memmove(c->b, p, c->elsz);
-	c->u = Sdone;
 	signal(c->da);
+	while(c->n >= n){
+		dprintf("send -- unbuf wait for sc\n");
+		wait(c->sc, c->l);
+	}
+	c->u--;
 	unlock(c->l);
 	return 1;
 }
@@ -175,14 +182,14 @@ urecv(Chan *c, void *p)
 {
 	c->n++;
 	signal(c->sa);
-	while(c->u != Sdone){
-		dprintf("recv -- unbuf wait for sender\n");
+	while(c->u < 1){
+		dprintf("recv -- unbuf wait for send\n");
 		wait(c->da, c->l);
 	}
 	dprintf("recv -- unbuf proceed\n");
 	memmove(p, c->b, c->elsz);
 	c->n--;
-	c->u = Snone;
+	signal(c->sc);
 	unlock(c->l);
 	return 1;
 }
