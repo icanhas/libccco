@@ -47,16 +47,21 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 		return nil;
 	if(tlsindex == -1)
 		tlsindex = TlsAlloc();
+	if(initcond(&wake) != 0){
+		TlsFree(tlsindex);
+		return nil;
+	}
 	t->name = nil;
 	t->fn = fn;
 	t->arg = arg;
 	t->wake = wake;
 	t->running = 0;
-	entr = (LPTHREAD_START_ROUTINE)&run;
+	entr = (LPTHREAD_START_ROUTINE)run;
 	h = CreateThread(nil, stksz, entr, t, 0, nil);
 	if(h == nil){
-		errorf("createthread - win32 CreateThread failed\n");
+		errorf("createthread -- win32 CreateThread failed\n");
 		free(t);
+		TlsFree(tlsindex);
 		return nil;
 	}
 	t->h = h;
