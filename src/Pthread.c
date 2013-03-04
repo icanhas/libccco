@@ -24,7 +24,7 @@ struct _Thread {
 	pthread_t		t;
 	pthread_attr_t	attr;
 	Cond	wake;	/* thread starts when wake && running */
-	int	running;
+	volatile int	running;
 	Rand	r;
 };
 
@@ -304,6 +304,7 @@ run(void *arg)
 		dprintf("thread suspend\n");
 		wait(&t->wake, &fake);
 	}
+	destroycond(&t->wake);
 	unlock(&fake);
 	destroylock(&fake);
 	dprintf("thread %p starts\n", t);
