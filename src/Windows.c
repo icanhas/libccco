@@ -7,22 +7,24 @@
 #include "fn.h"
 
 struct _Lock {
-	CRITICAL_SECTION	l;
+	CRITICAL_SECTION	cs;
 };
 
 struct _Cond {
-	HANDLE	c;
-	Lock	lwaiters;
-	long	nwaiters;
+	HANDLE	event;
+	Lock	cl;	/* count lock */
+	volatile long	nw;	/* num. waiters */
+	volatile long	nr;	/* num. threads to release on signal */
+	volatile long	wg;	/* wait generation */
 };
 
 struct _Thread {
 	char*	name;
 	void	(*fn)(void*);	/* proc 'main' */
 	void*	arg;		/* proc args */
-	HANDLE	h;		/* thread handle */
-	Cond	wake;
-	int	running;
+	HANDLE	h;		/* the Windows thread itself */
+	Cond	wake;	/* thread starts when wake && running */
+	volatile int	running;
 	Rand	r;
 };
 
@@ -112,13 +114,11 @@ Lock*
 createlock(void)
 {
 	Lock *l;
-	CRITICAL_SECTION cs;
 	
 	l = malloc(sizeof *l);
 	if(l == nil)
 		return nil;
-	InitializeCriticalSection(&cs);
-	l->l = cs;
+	initlock(l);
 	return l;
 }
 
@@ -134,7 +134,7 @@ int
 initlock(Lock *l)
 {
 	assert(l != nil);
-	InitializeCriticalSection(&l->l);
+	InitializeCriticalSection(&l->cs);
 	return 0;
 }
 
@@ -142,7 +142,7 @@ void
 destroylock(Lock *l)
 {
 	assert(l != nil);
-	DeleteCriticalSection(&l->l);
+	DeleteCriticalSection(&l->cs);
 }
 
 int
@@ -150,10 +150,10 @@ lock(Lock *l, int blocking)
 {
 	assert(l != nil);
 	if(blocking){
-		EnterCriticalSection(&l->l);
+		EnterCriticalSection(&l->cs);
 		return 1;
 	}
-	if(TryEnterCriticalSection(&l->l))
+	if(TryEnterCriticalSection(&l->cs))
 		return 1;
 	return 0;
 }
@@ -162,7 +162,7 @@ int
 unlock(Lock *l)
 {
 	assert(l != nil);
-	LeaveCriticalSection(&l->l);
+	LeaveCriticalSection(&l->cs);
 	return 0;
 }
 
@@ -195,17 +195,19 @@ int
 initcond(Cond *c)
 {
 	assert(c != nil);
-	c->c = CreateEvent(NULL, TRUE, FALSE, TEXT("Cond"));
-	if(c->c == nil){
+	c->event = CreateEvent(NULL, TRUE, FALSE, TEXT("Cond"));
+	if(c->event == nil){
 		errorf("initcond -- CreateEvent failed\n");
 		return -1;
 	}
-	if(initlock(&c->lwaiters) != 0){
+	if(initlock(&c->cl) != 0){
 		errorf("initcond -- initlock failed\n");
-		CloseHandle(c->c);
+		CloseHandle(c->event);
 		return -1;
 	}
-	c->nwaiters = 0;
+	c->nw = 0;
+	c->nr = 0;
+	c->wg = 0;
 	return 0;
 }
 
@@ -213,35 +215,55 @@ void
 destroycond(Cond *c)
 {
 	assert(c != nil);
-	CloseHandle(c->c);
+	CloseHandle(c->event);
+	destroylock(&c->cl);
 }
 
 int
 wait(Cond *c, Lock *l)
 {
+	long mygen;
+	int done, last;
+	
 	assert(c != nil);
 	assert(l != nil);
-	lock(&c->lwaiters, 1);
-	c->nwaiters++;
-	unlock(&c->lwaiters);
+	
+	lock(&c->cl, 1);
+	c->nw++;
+	mygen = c->wg;
+	unlock(&c->cl);
 	unlock(l);
-	while(WaitForSingleObject(c->c, INFINITE) != WAIT_OBJECT_0)
-		;
-	lock(&c->lwaiters, 1);
-	c->nwaiters--;
-	unlock(&c->lwaiters);
-	if(c->nwaiters <= 0)
-		ResetEvent(c->c);
+	for(done = 0; !done;){
+		WaitForSingleObject(c->event, INFINITE);
+		lock(&c->cl, 1);
+		done = ((c->nr > 0) && (c->wg != mygen));
+		unlock(&c->cl);
+	}
 	lock(l, 1);
-	return 0;
+	lock(&c->cl, 1);
+	c->nw--;
+	c->nr--;
+	last = (c->nr == 0);
+	unlock(&c->cl);
+	if(last)
+		ResetEvent(c->event);
 }
 
 int
 signal(Cond *c)
 {
 	assert(c != nil);
-	SetEvent(c->c);
-	return 0;
+	
+	lock(&c->cl, 1);
+	if(c->nw > 0){
+		SetEvent(c->event);
+		/*
+		 * Release all threads in this gen and create a new gen
+		 */
+		c->nr = c->nw;
+		c->wg++;
+	}
+	unlock(&c->cl);
 }
 
 void
@@ -294,6 +316,7 @@ run(void *arg)
 		dprintf("thread suspend\n");
 		wait(&t->wake, &fake);
 	}
+	destroycond(&t->wake);
 	unlock(&fake);
 	destroylock(&fake);
 	dprintf("thread %p starts\n", t);
