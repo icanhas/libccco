@@ -27,6 +27,7 @@ endif
 
 PREFIX?=/usr/local
 LD=${CC}
+LDFLAGS+=-L${PREFIX}/lib
 AS?=as
 AR?=ar
 RANLIB?=ranlib
