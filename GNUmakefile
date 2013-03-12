@@ -25,13 +25,4 @@ ifeq (${OS},windows)
   endif
 endif
 
-PREFIX?=/usr/local
-LD=${CC}
-LDFLAGS+=-L${PREFIX}/lib
-AS?=as
-AR?=ar
-RANLIB?=ranlib
-O=o
-A=a
-
 include Makefile.port

@@ -1,3 +1,11 @@
+PREFIX?=/usr/local
+LD=${CC}
+LDFLAGS+=-L${PREFIX}/lib
+AS?=as
+AR?=ar
+RANLIB?=ranlib
+O=o
+A=a
 ver=0.0.9
 libmkargs=CC=${CC} LD=${LD} AS=${AS} AR=${AR} RANLIB=${RANLIB} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' O=$O A=$A inc='-I../include -I${PREFIX}/include' \
   OS=${OS} ARCH=${ARCH} PREFIX=${PREFIX} FORCE_PTHREAD=${FORCE_PTHREAD} FORCE_C11=${FORCE_C11} \
