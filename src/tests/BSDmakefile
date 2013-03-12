@@ -1,0 +1,12 @@
+.if ${OS} == "windows"
+  platlibs=-lkernel32
+.else
+  platlibs=-lpthread
+.endif
+
+.if ${FORCE_PTHREAD} == 1
+  platlibs=-lpthread
+.endif
+
+.include "Makefile.port"
+
