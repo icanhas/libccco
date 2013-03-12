@@ -1,31 +1,34 @@
-ver=0.0.8
-libmkargs=CC=${CC} CFLAGS=${CFLAGS} O=$O A=$A inc=-I../include \
-  host=${host} FORCE_PTHREAD=${FORCE_PTHREAD} FORCE_C11=${FORCE_C11} \
+ver=0.0.9
+libmkargs=CC=${CC} LD=${LD} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' O=$O A=$A inc='-I../include' \
+  OS=${OS} ARCH=${ARCH} FORCE_PTHREAD=${FORCE_PTHREAD} FORCE_C11=${FORCE_C11} \
    ver=${ver}
-testmkargs=CC=${CC} CFLAGS=${CFLAGS} E=$E O=$O A=$A inc=-I../ bin=../../bin \
-  host=${host} FORCE_PTHREAD=${FORCE_PTHREAD}
+testmkargs=CC=${CC} LD=${LD} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' E=$E O=$O A=$A inc='-I../' bin=../../bin \
+  OS=${OS} ARCH=${ARCH} FORCE_PTHREAD=${FORCE_PTHREAD}
 
-all: mkdirs thelib
+all: info mkdirs thelib
+
+info:
+	@echo ${OS} ${ARCH}
 
 mkdirs:
-	mkdir -p bin
-	mkdir -p lib
+	@mkdir -p bin
+	@mkdir -p lib
 
-thelib:
-	cd src && make ${libmkargs}
+thelib: info
+	@cd src && make ${libmkargs}
 	
 install: all
-	cd src && make install ${libmkargs}
+	@cd src && make install ${libmkargs}
 	
-tests:
-	cd src/tests && make ${testmkargs}
+tests: info
+	@cd src/tests && make ${testmkargs}
 	
-clean:
-	cd src && make clean ${libmkargs}
-	cd src/tests && make clean ${testmkargs}
+clean: info
+	@cd src && make clean ${libmkargs}
+	@cd src/tests && make clean ${testmkargs}
 	
-nuke:
-	cd src && make nuke ${libmkargs}
+nuke: info
+	@cd src && make nuke ${libmkargs}
 	
 distfiles = \
    LICENSE \
