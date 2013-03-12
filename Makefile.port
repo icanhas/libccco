@@ -1,8 +1,8 @@
 ver=0.0.9
-libmkargs=CC=${CC} LD=${LD} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' O=$O A=$A inc='-I../include' \
+libmkargs=CC=${CC} LD=${LD} AS=${AS} AR=${AR} RANLIB=${RANLIB} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' O=$O A=$A inc='-I../include' \
   OS=${OS} ARCH=${ARCH} PREFIX=${PREFIX} FORCE_PTHREAD=${FORCE_PTHREAD} FORCE_C11=${FORCE_C11} \
    ver=${ver}
-testmkargs=CC=${CC} LD=${LD} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' E=$E O=$O A=$A inc='-I../' bin=../../bin \
+testmkargs=CC=${CC} LD=${LD} AS=${AS} AR=${AR} RANLIB=${RANLIB} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' E=$E O=$O A=$A inc='-I../' bin=../../bin \
   OS=${OS} ARCH=${ARCH} PREFIX=${PREFIX} FORCE_PTHREAD=${FORCE_PTHREAD}
 
 all: info mkdirs thelib

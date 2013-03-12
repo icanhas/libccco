@@ -24,6 +24,9 @@ ARCH?=${hostarch}
 
 PREFIX?=/usr/local
 LD=${CC}
+AS?=as
+AR?=ar
+RANLIB?=ranlib
 O=o
 A=a
 

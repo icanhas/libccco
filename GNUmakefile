@@ -25,11 +25,11 @@ ifeq (${OS},windows)
   endif
 endif
 
-ifeq (${PREFIX},)
-  PREFIX=/usr/local
-endif
-
+PREFIX?=/usr/local
 LD=${CC}
+AS?=as
+AR?=ar
+RANLIB?=ranlib
 O=o
 A=a
 
