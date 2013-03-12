@@ -33,6 +33,7 @@ nuke: info
 distfiles = \
    LICENSE \
    Makefile.port \
+   BSDmakefile \
    GNUmakefile \
    include \
    src
