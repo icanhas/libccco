@@ -1,9 +1,9 @@
 ver=0.0.9
 libmkargs=CC=${CC} LD=${LD} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' O=$O A=$A inc='-I../include' \
-  OS=${OS} ARCH=${ARCH} FORCE_PTHREAD=${FORCE_PTHREAD} FORCE_C11=${FORCE_C11} \
+  OS=${OS} ARCH=${ARCH} PREFIX=${PREFIX} FORCE_PTHREAD=${FORCE_PTHREAD} FORCE_C11=${FORCE_C11} \
    ver=${ver}
 testmkargs=CC=${CC} LD=${LD} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' E=$E O=$O A=$A inc='-I../' bin=../../bin \
-  OS=${OS} ARCH=${ARCH} FORCE_PTHREAD=${FORCE_PTHREAD}
+  OS=${OS} ARCH=${ARCH} PREFIX=${PREFIX} FORCE_PTHREAD=${FORCE_PTHREAD}
 
 all: info mkdirs thelib
 
@@ -38,7 +38,10 @@ distfiles = \
    src
 
 dist: clean
-	tar cf tmp.tar ${distfiles}
+	mkdir libcsp-${ver}/
+	cp -R ${distfiles} libcsp-${ver}/
+	tar cf tmp.tar libcsp-${ver}/
 	gzip <tmp.tar >libcsp-${ver}.tar.gz
 	bzip2 <tmp.tar >libcsp-${ver}.tar.bz2
 	rm tmp.tar
+	rm -r libcsp-${ver}

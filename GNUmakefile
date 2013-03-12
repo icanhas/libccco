@@ -18,9 +18,15 @@ endif
 
 ifeq (${OS},windows)
   E=.exe
-  ifeq (${CC},cc)
-    CC=gcc
+  ifeq (${hostos},mingw32)
+    ifeq (${CC},cc)
+      CC=gcc
+    endif
   endif
+endif
+
+ifeq (${PREFIX},)
+  PREFIX=/usr/local
 endif
 
 LD=${CC}

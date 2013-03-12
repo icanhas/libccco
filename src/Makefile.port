@@ -35,18 +35,19 @@ all: ${libpath}
 
 ${libpath}: ${ofiles}
 	${AR} rsc $@ $^
+	${RANLIB} $@
 	
 install: all
-	cp ${libpath} /usr/local/lib/${libname}
-	chmod 0664 /usr/local/lib/${libname}
-	cp ../include/csp.h /usr/local/include/csp.h
-	chmod 0664 /usr/local/include/csp.h
+	cp ${libpath} ${PREFIX}/lib/${libname}
+	chmod 0664 ${PREFIX}/lib/${libname}
+	cp ../include/csp.h ${PREFIX}/include/csp.h
+	chmod 0664 ${PREFIX}/include/csp.h
 	
 clean:
 	rm -f *.o
 	rm -f ${libpath}
 	
 nuke: clean
-	rm -f /usr/local/lib/${libname}
-	rm -f /usr/local/include/csp.h
+	rm -f ${PREFIX}/lib/${libname}
+	rm -f ${PREFIX}/include/csp.h
 
