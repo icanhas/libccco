@@ -68,7 +68,7 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	}
 	t->h = h;
 	t->running = 1;
-	signal(&t->wake);
+	csignal(&t->wake);
 	return t;
 }
 
@@ -250,7 +250,7 @@ wait(Cond *c, Lock *l)
 }
 
 int
-signal(Cond *c)
+csignal(Cond *c)
 {
 	assert(c != nil);
 	
