@@ -55,7 +55,7 @@ chanopen(Chan *c, long nel, long elsz)
 		return -1;
 	}
 	c->l = l;
-	c->status = Closed;
+	c->status = Open;
 	c->da = da;
 	c->sa = sa;
 	c->sc = sc;
