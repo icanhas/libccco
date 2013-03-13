@@ -33,9 +33,9 @@ all: ${libpath}
 .c.$O:
 	${CC} ${CFLAGS} ${inc} -c -o $@ $<
 
-${libpath}: ${libpath}(${ofiles})
-	${RANLIB} $@
-	
+${libpath}: ${ofiles}
+	${AR} rsc $@ $?
+
 install: all
 	cp ${libpath} ${PREFIX}/lib/${libname}
 	chmod 0664 ${PREFIX}/lib/${libname}
