@@ -48,6 +48,7 @@ distfiles = \
    BSDmakefile \
    GNUmakefile \
    include \
+   man \
    src
 
 dist: clean
