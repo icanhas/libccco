@@ -12,6 +12,7 @@ libmkargs=CC=${CC} LD=${LD} AS=${AS} AR=${AR} RANLIB=${RANLIB} CFLAGS='${CFLAGS}
    ver=${ver}
 testmkargs=CC=${CC} LD=${LD} AS=${AS} AR=${AR} RANLIB=${RANLIB} CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}' E=$E O=$O A=$A inc='-I../ -I${PREFIX}/include' bin=../../bin \
   OS=${OS} ARCH=${ARCH} PREFIX=${PREFIX} FORCE_PTHREAD=${FORCE_PTHREAD}
+manmkargs=PREFIX=${PREFIX}
 
 all: info mkdirs thelib
 
@@ -27,6 +28,7 @@ thelib: info
 	
 install: all
 	@cd src && make install ${libmkargs}
+	@cd man && make install ${manmkargs}
 	
 tests: info
 	@cd src/tests && make ${testmkargs}
@@ -34,9 +36,11 @@ tests: info
 clean: info
 	@cd src && make clean ${libmkargs}
 	@cd src/tests && make clean ${testmkargs}
+	@cd man && make clean ${manmkargs}
 	
 nuke: info
 	@cd src && make nuke ${libmkargs}
+	@cd man && make nuke ${manmkargs}
 	
 distfiles = \
    LICENSE \

@@ -23,4 +23,3 @@ ARCH?=${hostarch}
 .endif
 
 .include "Makefile.port"
-
