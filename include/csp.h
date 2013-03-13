@@ -7,6 +7,7 @@ typedef struct _Cond	Cond;
 
 struct Chan {
 	Lock*		l;
+	unsigned short	status;	/* open or not (dat.h) */
 	Cond*		da;	/* data became available in buf */
 	Cond*		sa;	/* recver wants to proceed, or just finished recving */
 	Cond*		sc;	/* send complete */

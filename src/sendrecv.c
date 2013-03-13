@@ -27,6 +27,10 @@ _send(Chan *c, void *p, int blocking)
 		errorf("send -- nil Chan\n");
 		return -1;
 	}
+	if(c->status != Open){
+		errorf("send -- called on closed channel\n");
+		return -1;
+	}
 
 	lock(c->l, 1);
 	if(blocking){
@@ -53,6 +57,10 @@ _recv(Chan *c, void *p, int blocking)
 	}
 	if(p == nil){
 		errorf("recv -- nil receive buffer\n");
+		return -1;
+	}
+	if(c->status != Open){
+		errorf("recv -- called on closed channel\n");
 		return -1;
 	}
 

@@ -11,3 +11,8 @@ struct Rand {
 	ulong sz;
 	ulong i;
 };
+
+enum {
+	Closed,
+	Open=	0xccc0
+} Chanstatus;

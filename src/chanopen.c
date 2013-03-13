@@ -10,6 +10,12 @@ chanopen(Chan *c, long nel, long elsz)
 	Cond *da, *sa, *sc;
 	uchar *buf;
 
+	if(c == nil)
+		return -1;
+	if(c->status == Open){
+		errorf("chanopen -- called on open channel\n");
+		return -1;
+	}
 	l = createlock();
 	if(l == nil){
 		errorf("chanopen -- failed to alloc lock\n");
@@ -49,6 +55,7 @@ chanopen(Chan *c, long nel, long elsz)
 		return -1;
 	}
 	c->l = l;
+	c->status = Closed;
 	c->da = da;
 	c->sa = sa;
 	c->sc = sc;
