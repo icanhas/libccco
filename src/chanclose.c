@@ -9,6 +9,10 @@ chanclose(Chan *c)
 {
 	if(c == nil)
 		return;
+	if(c->status != Open){
+		errorf("chanclose -- called on closed channel\n");
+		return;
+	}
 	lock(c->l, 1);
 	c->status = Closed;
 	freecond(c->da);
