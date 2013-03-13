@@ -1,0 +1,193 @@
+.Dd 2013-03-13
+.Dt LIBCSP 3
+.Os
+.Sh NAME
+chanalt
+chancreate
+chanfree
+channbrecv
+channbrecvp
+channbsend
+channbsendp
+chanrecv
+chanrecvp
+chansend
+chansendp
+proccreate
+procexit
+procfree
+procgetname
+procinit
+prockill
+procrand
+procsetname
+procsleep
+procsrand -- parallel programming procedures
+.Pp
+.Sh SYNOPSIS
+.Bd -literal
+#include <csp.h>
+.Pp
+typedef struct Chan	Chan;
+typedef struct Alt	Alt;
+typedef struct Proc	Proc;
+.Pp
+Proc*	proccreate(void (*fn)(void*), void *arg, int stksz);
+void	procfree(Proc *proc);
+int	procinit(Proc *proc, void (*fn)(void*), void *arg, int stksz);
+void	prockill(Proc *proc);
+void	procsetname(const char*, ...);
+char*	procgetname(void);
+void	procsleep(long);
+void	procexit(void);
+void	procsrand(long);
+long	procrand(void);
+Chan*	chancreate(long nel, long elsz);
+void	chanfree(Chan* chan);
+int	chanopen(Chan* chan);
+void	chanclose(Chan* chan);
+void	chanalt(Alt*);
+int	chanrecv(Chan*, void*);
+void*	chanrecvp(Chan*);
+int	channbrecv(Chan*, void*);
+void*	channbrecvp(Chan*);
+int	chansend(Chan*, void*);
+int	chansendp(Chan*, void*);
+int	channbsend(Chan*, void*);
+int	channbsendp(Chan*, void*);
+.Ed
+.\"
+.Sh DESCRIPTION
+.Bd -filled
+.Pp
+Libcsp is a parallel programming library inspired by several programming
+languages including Limbo, Occam, Alef, and Go, as well as the Plan
+9 and Inferno operating systems.  It provides a programming interface
+similar to that provided by Plan 9's libthread.
+.\" --
+.Pp
+.Ss Processes
+Processes have a 1:1 correspondence with system threads.
+A
+.Em Proc
+holds the state of a process.
+A program's
+main thread should not call any of the procedures prefixed with
+.Em proc;
+they only behave correctly if called by a process. 
+Processes may, in turn, create new processes.
+.Pp
+.Em Proccreate
+and
+.Em procinit
+create a new process that will run
+.Em fn(arg).
+The size of the process's stack is specified by
+.Em stksz;
+if
+.Em stksz
+is zero, the system's default stack size for threads will be used.
+.Em Proccreate
+returns a pointer to a newly allocated
+.Em Proc,
+so the pointer must be freed later by
+.Em procfree.
+On the other hand,
+.Em Proc
+structures that were initialized by a prior call to
+.Em procinit
+must be destroyed by
+.Em prockill.
+.Em Proccreate
+returns a null pointer if it encounters an error.
+.Em Procinit 
+returns a non-zero value if it encounters an error.
+.Pp
+.Em Procexit
+terminates the calling process; any
+.Em Proc
+structures associated with it will remain intact.
+.Pp
+.Em Procsetname
+sets the calling process's current name, and
+.Em procgetname
+returns it.  The pointer returned by
+.Em procgetname
+is valid until the next call to
+.Em procsetname.
+.\" --
+.Pp
+.Ss Channels
+Channels are a means of combined communication and synchronization
+between two or more processes (including the program's main thread in
+this special case).
+A
+.Em Chan
+holds the state of a channel.  
+.Pp
+.Em Chanopen
+opens a channel of
+.Em nel
+elements
+.Em elsz
+bytes in size, and initialises the
+.Em Chan
+indicated by
+.Em chan.
+If
+.Em nel
+is zero, the channel will be unbuffered.
+.Em Chanopen
+returns a non-zero value if it encounters an error.
+The channel must later be closed and the
+.Em Chan
+destroyed by
+.Em chanclose.
+.Pp
+.Em Chancreate
+allocates a new
+.Em Chan
+and opens a channel
+.Em nel
+elements
+.Em elsz
+bytes in size.
+If
+.Em nel
+is zero, the channel will be unbuffered.
+.Em Chancreate
+returns a null pointer if it encounters an error.
+The returned pointer must later be freed (and the channel closed) by
+.Em chanfree.
+.\" --
+.Pp
+.Ss Random numbers
+Because interleaved or simultaneous calls to C's
+.Em rand
+and
+.Em srand
+procedures by multiple processes results in undefined behaviour, libcsp
+provides a pseudo-random number generator (henceforward called a RNG).
+.Pp
+.Em Procsrand
+seeds the RNG.
+.Em Procrand
+returns a random integer between 0 and 2,147,483,647, provided the RNG
+has been seeded (otherwise the return value is undefined).
+.Pp
+Each process has its own RNG, so calls to
+.Em procrand
+will yield a reproducible period regardless of whether other processes
+have called
+.Em procrand
+or
+.Em procsrand.
+Likewise, calls to
+.Em procsrand
+will not interfere with other processes.
+.Pp
+The RNG's underlying mechanism is a Mersenne twister (MT19937) populated
+by repeated applications of an equation taken from a Pokémon video game.
+.Sh BUGS
+Alting is not yet implemented.
+.Ed
