@@ -10,4 +10,5 @@ chanfree(Chan *c)
 		return;
 	chanclose(c);
 	free(c);
+	c = nil;
 }

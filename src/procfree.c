@@ -11,4 +11,5 @@ procfree(Proc *p)
 		return;
 	prockill(p);
 	free(p);
+	p = nil;
 }
