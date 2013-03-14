@@ -1,31 +1,31 @@
-.Dd 2013-03-13
+.Dd $Mdocdate$
 .Dt LIBCSP 3
 .Os
 .Sh NAME
-chanalt
-chanclose
-chancreate
-chanfree
-channbrecv
-channbrecvp
-channbsend
-channbsendp
-chanopen
-chanrecv
-chanrecvp
-chansend
-chansendp
-proccreate
-procexit
-procfree
-procgetname
-procinit
-prockill
-procrand
-procsetname
-procsleep
-procsrand
--- parallel programming procedures
+.Nm chanalt
+.Nm chanclose
+.Nm chancreate
+.Nm chanfree
+.Nm channbrecv
+.Nm channbrecvp
+.Nm channbsend
+.Nm channbsendp
+.Nm chanopen
+.Nm chanrecv
+.Nm chanrecvp
+.Nm chansend
+.Nm chansendp
+.Nm proccreate
+.Nm procexit
+.Nm procfree
+.Nm procgetname
+.Nm procinit
+.Nm prockill
+.Nm procrand
+.Nm procsetname
+.Nm procsleep
+.Nm procsrand
+.Nd parallel programming procedures
 .Pp
 .Sh SYNOPSIS
 .Bd -literal
@@ -61,7 +61,6 @@ int	channbsendp(Chan*, void*);
 .Ed
 .\"
 .Sh DESCRIPTION
-.Bd -filled
 .Pp
 Libcsp is a parallel programming library inspired by several programming
 languages including Limbo, Occam, Alef, and Go, as well as the Plan
@@ -193,4 +192,3 @@ The RNG's underlying mechanism is a Mersenne twister (MT19937) populated
 by repeated applications of an equation taken from a Pokémon video game.
 .Sh BUGS
 Alting is not yet implemented.
-.Ed
