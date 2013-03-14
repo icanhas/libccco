@@ -51,14 +51,14 @@ void	chanfree(Chan* chan);
 int	chanopen(Chan* chan);
 void	chanclose(Chan* chan);
 void	chanalt(Alt*);
-int	chanrecv(Chan*, void*);
-void*	chanrecvp(Chan*);
-int	channbrecv(Chan*, void*);
-void*	channbrecvp(Chan*);
-int	chansend(Chan*, void*);
-int	chansendp(Chan*, void*);
-int	channbsend(Chan*, void*);
-int	channbsendp(Chan*, void*);
+int	chanrecv(Chan* c, void* p);
+void*	chanrecvp(Chan* c);
+int	channbrecv(Chan* c, void* p);
+void*	channbrecvp(Chan* c);
+int	chansend(Chan* c, void* p);
+int	chansendp(Chan* c, void* p);
+int	channbsend(Chan* c, void* p);
+int	channbsendp(Chan* c, void* p);
 .Ed
 .\"
 .\"
@@ -129,9 +129,8 @@ is valid until the next call to
 .\" 
 .Ss Channels
 .Pp
-Channels are a means of combined communication and synchronization
-between two or more processes (including the program's main thread in
-this special case).
+Channels are a means of communication and synchronization between two or
+more processes (including the program's main thread in this special case).
 A
 .Em Chan
 holds the state of a channel.  
@@ -188,26 +187,37 @@ indicates that the operation is non-blocking, and
 indicates that the operation transfers a pointer rather than a value.
 Channel operations operate on one element in the channel per call.
 .Pp
-.Em Sends
-on a buffered channel will proceed if there is space for an element in
-the buffer, otherwise they will block until space becomes available. If
-the channel is unbuffered, sends will block until a
+A
+.Em send
+operation on a buffered channel proceeds if there is space for an element
+in the buffer, otherwise it blocks until space becomes available.
+If the channel is unbuffered, a
+.Em send 
+blocks until a
 .Em recv
- occurs in another process; likewise, 
-.Em recvs
-will block until a send occurs. 
-.Em Sends
-return -1 if they encounter an error, 1 otherwise. Non-blocking 
-.Em sends
-will return 0 if they would have blocked.
+occurs in another process; likewise, a
+.Em recv
+blocks until a 
+.Em send
+occurs.
+A
+.Em send
+operation returns -1 if it encounters an error, 1 otherwise. 
+A non-blocking
+.Em send
+returns 0 if it would have blocked.
 .Pp
-.Em Recvs
-on a buffered channel will block until at least one element becomes
+A
+.Em recv
+operation on a buffered channel blocks until at least one element becomes
 available in the buffer.
-.Em Recv 
-operations return -1 if they encounter an error, 1 otherwise. Non-blocking 
-.Em recvs
-will return 0 if they would have blocked. Exceptions to this convention
+A
+.Em recv 
+operation returns -1 if it encounters an error, 1 otherwise.
+A non-blocking 
+.Em recv
+returns 0 if it would have blocked.
+Exceptions to this convention
 are
 .Em chanrecvp
 and
@@ -223,7 +233,7 @@ Because interleaved or simultaneous calls to C's
 .Em rand
 and
 .Em srand
-procedures by multiple processes results in undefined behaviour, libcsp
+procedures by multiple processes result in undefined behaviour, libcsp
 provides a pseudo-random number generator (henceforward called a RNG).
 .Pp
 .Em Procsrand
