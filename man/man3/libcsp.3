@@ -36,15 +36,15 @@ typedef struct Chan	Chan;
 typedef struct Alt	Alt;
 typedef struct Proc	Proc;
 .Pp
-Proc*	proccreate(void (*fn)(void*), void *arg, int stksz);
-void	procfree(Proc *proc);
-int	procinit(Proc *proc, void (*fn)(void*), void *arg, int stksz);
-void	prockill(Proc *proc);
+Proc*	proccreate(void (*fn)(void*), void* arg, int stksz);
+void	procfree(Proc* proc);
+int	procinit(Proc* proc, void (*fn)(void*), void* arg, int stksz);
+void	prockill(Proc* proc);
 void	procsetname(const char*, ...);
 char*	procgetname(void);
-void	procsleep(long);
+void	procsleep(long dur);
 void	procexit(void);
-void	procsrand(long);
+void	procsrand(long seed);
 long	procrand(void);
 Chan*	chancreate(long nel, long elsz);
 void	chanfree(Chan* chan);
@@ -112,6 +112,11 @@ returns a non-zero value if it encounters an error.
 terminates the calling process; any
 .Em Proc
 structures associated with it will remain intact.
+.Pp
+.Em Procsleep
+blocks the calling process for at least
+.Em dur
+seconds.
 .Pp
 .Em Procsetname
 sets the calling process's current name, and
@@ -222,7 +227,8 @@ procedures by multiple processes results in undefined behaviour, libcsp
 provides a pseudo-random number generator (henceforward called a RNG).
 .Pp
 .Em Procsrand
-seeds the RNG.
+seeds the RNG with
+.Em seed.
 .Em Procrand
 returns a random integer between 0 and 2,147,483,647, provided the RNG
 has been seeded (otherwise the return value is undefined).
