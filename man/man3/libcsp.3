@@ -26,7 +26,8 @@
 .Nm procsleep
 .Nm procsrand
 .Nd parallel programming procedures
-.Pp
+.\"
+.\"
 .Sh SYNOPSIS
 .Bd -literal
 #include <csp.h>
@@ -60,15 +61,17 @@ int	channbsend(Chan*, void*);
 int	channbsendp(Chan*, void*);
 .Ed
 .\"
+.\"
 .Sh DESCRIPTION
 .Pp
 Libcsp is a parallel programming library inspired by several programming
-languages including Limbo, Occam, Alef, and Go, as well as the Plan
-9 and Inferno operating systems.  It provides a programming interface
-similar to that provided by Plan 9's libthread.
-.\" --
-.Pp
+languages including Limbo, Occam, Alef, and Go, as well as the Plan 9
+and Inferno operating systems.  Its programming interface similar to
+that provided by Plan 9's libthread.
+.\"
+.\"
 .Ss Processes
+.Pp
 Processes have a 1:1 correspondence with system threads.
 A
 .Em Proc
@@ -117,9 +120,10 @@ returns it.  The pointer returned by
 .Em procgetname
 is valid until the next call to
 .Em procsetname.
-.\" --
-.Pp
+.\" 
+.\" 
 .Ss Channels
+.Pp
 Channels are a means of combined communication and synchronization
 between two or more processes (including the program's main thread in
 this special case).
@@ -149,7 +153,7 @@ destroyed by
 .Em Chancreate
 allocates a new
 .Em Chan
-and opens a channel
+and opens a channel of
 .Em nel
 elements
 .Em elsz
@@ -161,9 +165,55 @@ is zero, the channel will be unbuffered.
 returns a null pointer if it encounters an error.
 The returned pointer must later be freed (and the channel closed) by
 .Em chanfree.
-.\" --
+.\"
+.\" 
+.Ss Channel operations
 .Pp
+Once a channel is open, it can be used to transfer data.
+Channel operations follow a naming scheme that indicates the differences
+in their behaviour.
+The naming scheme is
+.Em chan[nb]send[p]
+and
+.Em chan[nb]recv[p],
+where
+.Em nb
+indicates that the operation is non-blocking, and
+.Em p
+indicates that the operation transfers a pointer rather than a value.
+Channel operations operate on one element in the channel per call.
+.Pp
+.Em Sends
+on a buffered channel will proceed if there is space for an element in
+the buffer, otherwise they will block until space becomes available. If
+the channel is unbuffered, sends will block until a
+.Em recv
+ occurs in another process; likewise, 
+.Em recvs
+will block until a send occurs. 
+.Em Sends
+return -1 if they encounter an error, 1 otherwise. Non-blocking 
+.Em sends
+will return 0 if they would have blocked.
+.Pp
+.Em Recvs
+on a buffered channel will block until at least one element becomes
+available in the buffer.
+.Em Recv 
+operations return -1 if they encounter an error, 1 otherwise. Non-blocking 
+.Em recvs
+will return 0 if they would have blocked. Exceptions to this convention
+are
+.Em chanrecvp
+and
+.Em channbrecvp,
+both of which return a null pointer if they encounter an error, as will
+.Em channbrecvp
+if it would have blocked.
+.\"
+.\" 
 .Ss Random numbers
+.Pp
 Because interleaved or simultaneous calls to C's
 .Em rand
 and
@@ -191,4 +241,9 @@ will not interfere with other processes.
 The RNG's underlying mechanism is a Mersenne twister (MT19937) populated
 by repeated applications of an equation taken from a Pokémon video game.
 .Sh BUGS
+.Pp
 Alting is not yet implemented.
+.Pp
+Unbuffered channels only mimic unbuffered behaviour; they actually use a
+one-element buffer. This keeps the implementation of unbuffered channel
+operations as straightforward as possible.
