@@ -33,13 +33,13 @@ struct {
 void
 testrand(void *arg)
 {
+	Chan *reply;
 	size_t i;
 	int j;
 	ulong r;
-	Chan *done;
 	
 	procsetname("testrand");
-	done = arg;
+	reply = arg;
 	for(i = 0; i < alen(tests); i++){
 		procsrand(tests[i].seed);
 		for(j = 0; j < Nrand; j++){
@@ -47,31 +47,32 @@ testrand(void *arg)
 			if(r != tests[i].expect[j]){
 				printf("fail: (seed %lu, j %d) -- expected %lu got %lu\n", tests[i].seed,
 					j, tests[i].expect[j], r);
+				chansend(reply, &(int){1});
 			}
 		}
 	}
-	chansend(done, &(int){1});
+	chansend(reply, &(int){0});
 }
 
 int
 main(int argc, char **argv)
 {
 	Proc procs[Nproc];
-	Chan ch;
-	int i;
+	Chan reply;
+	int i, n, fail;
 	
-	assert(chanopen(&ch, 0, sizeof(int)) == 0);
+	assert(chanopen(&reply, 0, sizeof(int)) == 0);
 	for(i = 0; i < Nproc; ++i){
-		assert(procinit(&procs[i], testrand, &ch, 0) == 0);
+		assert(procinit(&procs[i], testrand, &reply, 0) == 0);
 	}
+	fail = n = 0;
 	for(i = 0; i < Nproc; ++i){
-		int n;
-		
-		chanrecv(&ch, &n);
+		chanrecv(&reply, &n);
+		fail |= n;
 	}
 	for(i = 0; i < Nproc; ++i)
 		prockill(&procs[i]);
-	chanclose(&ch);
+	chanclose(&reply);
 	fflush(stdout);
-	return 0;
+	return fail;
 }
