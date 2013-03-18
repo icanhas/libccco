@@ -1,12 +1,19 @@
 libs=-lcsp ${platlibs} -lm
+CFLAGS+=${inc}
 b=${bin}
 
-all: clean $b/1$E $b/2$E $b/spawnexit$E $b/chanrecvp$E \
-	$b/closedchan$E $b/openedchan$E
-
+all: clean \
+  $b/1$E \
+  $b/2$E \
+  $b/spawnexit$E \
+  $b/chanrecvp$E \
+  $b/closedchan$E \
+  $b/openedchan$E \
+  $b/random$E
+  
 .c.$O:
-	${CC} ${CFLAGS} ${inc} -c -o $@ $<
-
+	${CC} ${CFLAGS} -c -o $@ $<
+	
 c=${CC} ${LDFLAGS} -o $@ $? ${libs}
 $b/1$E: 1.$O
 	$c
@@ -20,11 +27,15 @@ $b/closedchan$E: closedchan.$O
 	$c
 $b/openedchan$E: openedchan.$O
 	$c
+$b/random$E: random.$O
+	$c
 
 clean:
-	rm -f $b/1$E 1.$O \
+	rm -f \
+		$b/1$E 1.$O \
 		$b/2$E 2.$O \
 		$b/spawnexit$E spawnexit.$O \
 		$b/chanrecvp$E chanrecvp.$O \
 		$b/closedchan$E closedchan.$O \
-		$b/openedchan$E openedchan.$O
+		$b/openedchan$E openedchan.$O \
+		$b/random$E random.$O
