@@ -17,8 +17,6 @@ all: clean \
 c=${CC} ${LDFLAGS} -o $@ $? ${libs}
 $b/1$E: 1.$O
 	$c
-$b/2$E: 2.$O
-	$c
 $b/spawnexit$E: spawnexit.$O
 	$c
 $b/chanrecvp$E: chanrecvp.$O
