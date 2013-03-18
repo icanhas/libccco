@@ -4,7 +4,6 @@ b=${bin}
 
 all: clean \
   $b/1$E \
-  $b/2$E \
   $b/spawnexit$E \
   $b/chanrecvp$E \
   $b/closedchan$E \
@@ -31,7 +30,6 @@ $b/random$E: random.$O
 clean:
 	rm -f \
 		$b/1$E 1.$O \
-		$b/2$E 2.$O \
 		$b/spawnexit$E spawnexit.$O \
 		$b/chanrecvp$E chanrecvp.$O \
 		$b/closedchan$E closedchan.$O \
