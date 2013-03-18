@@ -84,7 +84,6 @@ freethread(Thread *t)
 	assert(t != nil);
 	if(t->name != nil)
 		free(t->name);
-	destroycond(&t->wake);
 	pthread_detach(t->t);
 	pthread_attr_destroy(&t->attr);
 	destroyrand(&t->r);
@@ -222,7 +221,7 @@ void
 destroycond(Cond *c)
 {
 	assert(c != nil);
-	(void)pthread_cond_destroy(&c->c);
+	while(pthread_cond_destroy(&c->c) != 0);
 }
 
 int
@@ -324,6 +323,8 @@ destruct(void *keydata)
 	Thread *t;
 	
 	dprintf("destruct\n");
+	if(0){
 	t = (Thread*)keydata;
 	destroyrand(&t->r);
+	}
 }
