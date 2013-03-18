@@ -1,13 +1,23 @@
 libs=-lcsp ${platlibs} -lm
 b=${bin}
 
-all: clean \
+progs= \
   $b/1$E \
   $b/spawnexit$E \
   $b/chanrecvp$E \
   $b/closedchan$E \
   $b/openedchan$E \
   $b/random$E
+  
+ofiles= \
+  1.$O \
+  spawnexit.$O \
+  chanrecvp.$O \
+  closedchan.$O \
+  openedchan.$O \
+  random.$O
+
+all: clean ${progs}
   
 .c.$O:
 	${CC} ${CFLAGS} -c -o $@ $<
@@ -25,12 +35,9 @@ $b/openedchan$E: openedchan.$O
 	$c
 $b/random$E: random.$O
 	$c
+	
+runtests:
+	./runtests.sh 10 ${progs}
 
 clean:
-	rm -f \
-		$b/1$E 1.$O \
-		$b/spawnexit$E spawnexit.$O \
-		$b/chanrecvp$E chanrecvp.$O \
-		$b/closedchan$E closedchan.$O \
-		$b/openedchan$E openedchan.$O \
-		$b/random$E random.$O
+	rm -f ${progs} ${ofiles}

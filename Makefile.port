@@ -33,6 +33,9 @@ install: all
 tests: info
 	@cd src/tests && make ${testmkargs}
 	
+runtests:
+	@cd src/tests && make runtests ${testmkargs}
+	
 clean: info
 	@cd src && make clean ${libmkargs}
 	@cd src/tests && make clean ${testmkargs}
