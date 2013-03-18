@@ -1,5 +1,5 @@
 libs=-lcsp ${platlibs} -lm
-CFLAGS+=${inc}
+CFLAGS+=${inc} -I${PREFIX}/include
 b=${bin}
 
 all: clean \
