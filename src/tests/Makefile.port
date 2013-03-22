@@ -2,7 +2,6 @@ libs=-lcsp ${platlibs} -lm
 b=${bin}
 
 progs= \
-  $b/1$E \
   $b/spawnexit$E \
   $b/chanrecvp$E \
   $b/closedchan$E \
@@ -10,7 +9,6 @@ progs= \
   $b/random$E
   
 ofiles= \
-  1.$O \
   spawnexit.$O \
   chanrecvp.$O \
   closedchan.$O \
@@ -23,8 +21,6 @@ all: clean ${progs}
 	${CC} ${CFLAGS} -c -o $@ $<
 	
 c=${CC} ${LDFLAGS} -o $@ $? ${libs}
-$b/1$E: 1.$O
-	$c
 $b/spawnexit$E: spawnexit.$O
 	$c
 $b/chanrecvp$E: chanrecvp.$O
