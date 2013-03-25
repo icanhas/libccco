@@ -38,9 +38,9 @@ ${libpath}: ${ofiles}
 
 install: all
 	cp ${libpath} ${PREFIX}/lib/${libname}
-	chmod 0664 ${PREFIX}/lib/${libname}
+	chmod 0644 ${PREFIX}/lib/${libname}
 	cp ../include/ccco.h ${PREFIX}/include/ccco.h
-	chmod 0664 ${PREFIX}/include/ccco.h
+	chmod 0644 ${PREFIX}/include/ccco.h
 	
 clean:
 	rm -f *.o
