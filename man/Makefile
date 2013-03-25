@@ -1,7 +1,7 @@
 ofiles=\
-  man3/libcsp.ps \
-  man3/libcsp.pdf \
-  man3/libcsp.html
+  man3/libccco.ps \
+  man3/libccco.pdf \
+  man3/libccco.html
 
 all: ${ofiles}
 
@@ -19,8 +19,8 @@ clean:
 
 install:
 	@mkdir -p ${PREFIX}/man/man3/
-	cp man3/libcsp.3 ${PREFIX}/man/man3/libcsp.3
-	chmod 0644 ${PREFIX}/man/man3/libcsp.3
+	cp man3/libccco.3 ${PREFIX}/man/man3/libccco.3
+	chmod 0644 ${PREFIX}/man/man3/libccco.3
 
 nuke:
 	rm -f ${PREFIX}/man/man3/libcsp.3

@@ -1,5 +1,5 @@
 .Dd $Mdocdate$
-.Dt LIBCSP 3
+.Dt LIBCCCO 3
 .Os
 .Sh NAME
 .Nm chanalt
@@ -30,7 +30,7 @@
 .\"
 .Sh SYNOPSIS
 .Bd -literal
-#include <csp.h>
+#include <ccco.h>
 .Pp
 typedef struct Chan	Chan;
 typedef struct Alt	Alt;
@@ -64,7 +64,7 @@ int	channbsendp(Chan* c, void* p);
 .\"
 .Sh DESCRIPTION
 .Pp
-Libcsp is a parallel programming library inspired by several programming
+Libccco is a parallel programming library inspired by several programming
 languages including Limbo, Occam, Alef, and Go, as well as the Plan 9
 and Inferno operating systems.  Its programming interface similar to
 that provided by Plan 9's libthread.
@@ -233,7 +233,7 @@ Because interleaved or simultaneous calls to C's
 .Em rand
 and
 .Em srand
-procedures by multiple processes result in undefined behaviour, libcsp
+procedures by multiple processes result in undefined behaviour, libccco
 provides a pseudo-random number generator (henceforward called a RNG).
 .Pp
 .Em Procsrand
