@@ -55,16 +55,16 @@ distfiles = \
    src
 
 dist: clean
-	mkdir libcsp-${ver}/
-	cp -R ${distfiles} libcsp-${ver}/
-	tar cf tmp.tar libcsp-${ver}/
-	gzip <tmp.tar >libcsp-${ver}.tar.gz
-	bzip2 <tmp.tar >libcsp-${ver}.tar.bz2
+	mkdir libccco-${ver}/
+	cp -R ${distfiles} libccco-${ver}/
+	tar cf tmp.tar libccco-${ver}/
+	gzip <tmp.tar >libccco-${ver}.tar.gz
+	bzip2 <tmp.tar >libccco-${ver}.tar.bz2
 	rm tmp.tar
-	rm -r libcsp-${ver}
+	rm -r libccco-${ver}
 
 gitdist:
-	git archive --prefix=libcsp-${ver}/ --format=tar HEAD >tmp.tar
-	gzip <tmp.tar >libcsp-${ver}.tar.gz
-	bzip2 <tmp.tar >libcsp-${ver}.tar.bz2
+	git archive --prefix=libccco-${ver}/ --format=tar HEAD >tmp.tar
+	gzip <tmp.tar >libccco-${ver}.tar.gz
+	bzip2 <tmp.tar >libccco-${ver}.tar.bz2
 	rm tmp.tar
