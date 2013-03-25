@@ -6,7 +6,7 @@ AR?=ar
 RANLIB?=ranlib
 O=o
 A=a
-ver=0.0.9
+ver=0.1.0
 libmkargs=CC=${CC} LD=${LD} AS=${AS} AR=${AR} RANLIB=${RANLIB} CFLAGS='${CFLAGS} -I../include -I${PREFIX}/include' LDFLAGS='${LDFLAGS}' O=$O A=$A \
   OS=${OS} ARCH=${ARCH} PREFIX=${PREFIX} FORCE_PTHREAD=${FORCE_PTHREAD} FORCE_C11=${FORCE_C11} \
    ver=${ver}
