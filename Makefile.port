@@ -62,3 +62,9 @@ dist: clean
 	bzip2 <tmp.tar >libcsp-${ver}.tar.bz2
 	rm tmp.tar
 	rm -r libcsp-${ver}
+
+gitdist:
+	git archive --prefix=libcsp-${ver}/ --format=tar HEAD >tmp.tar
+	gzip <tmp.tar >libcsp-${ver}.tar.gz
+	bzip2 <tmp.tar >libcsp-${ver}.tar.bz2
+	rm tmp.tar
