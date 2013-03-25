@@ -39,8 +39,8 @@ ${libpath}: ${ofiles}
 install: all
 	cp ${libpath} ${PREFIX}/lib/${libname}
 	chmod 0664 ${PREFIX}/lib/${libname}
-	cp ../include/csp.h ${PREFIX}/include/csp.h
-	chmod 0664 ${PREFIX}/include/csp.h
+	cp ../include/ccco.h ${PREFIX}/include/ccco.h
+	chmod 0664 ${PREFIX}/include/ccco.h
 	
 clean:
 	rm -f *.o
@@ -48,5 +48,5 @@ clean:
 	
 nuke: clean
 	rm -f ${PREFIX}/lib/${libname}
-	rm -f ${PREFIX}/include/csp.h
+	rm -f ${PREFIX}/include/ccco.h
 
