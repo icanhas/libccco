@@ -5,5 +5,5 @@
 int
 channbsend(Chan *c, void *p)
 {
-	_send(c, p, 0);
+	return _send(c, p, 0);
 }
