@@ -23,8 +23,7 @@ struct _Thread {
 	void	(*fn)(void*);	/* proc 'main' */
 	void*	arg;		/* proc args */
 	HANDLE	h;		/* the Windows thread itself */
-	Cond	wake;	/* thread starts when wake && running */
-	volatile int	running;
+	Lock	runwait;
 	Rand	r;
 };
 
@@ -40,7 +39,7 @@ Thread*
 createthread(void (*fn)(void*), void *arg, int stksz)
 {
 	Thread *t;
-	Cond wake;
+	Lock runwait;
 	LPTHREAD_START_ROUTINE entr;
 	HANDLE h;
 	
@@ -49,15 +48,15 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 		return nil;
 	if(tlsindex == -1)
 		tlsindex = TlsAlloc();
-	if(initcond(&wake) != 0){
+	if(initlock(&runwait) != 0){
 		TlsFree(tlsindex);
 		return nil;
 	}
 	t->name = nil;
 	t->fn = fn;
 	t->arg = arg;
-	t->wake = wake;
-	t->running = 0;
+	t->runwait = runwait;
+	lock(&t->runwait, 1);
 	entr = (LPTHREAD_START_ROUTINE)run;
 	h = CreateThread(nil, stksz, entr, t, 0, nil);
 	if(h == nil){
@@ -67,8 +66,7 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 		return nil;
 	}
 	t->h = h;
-	t->running = 1;
-	csignal(&t->wake);
+	unlock(&t->runwait);
 	return t;
 }
 
@@ -303,23 +301,14 @@ static DWORD WINAPI
 run(void *arg)
 {
 	Thread *t;
-	Lock fake;
 	
 	t = (Thread*)arg;
+	dprintf("thread %p spawn\n", t);
 	TlsSetValue(tlsindex, t);
-	
 	initrand(&t->r);
-	
-	initlock(&fake);
-	lock(&fake, 1);
-	while(!t->running){
-		dprintf("thread suspend\n");
-		wait(&t->wake, &fake);
-	}
-	destroycond(&t->wake);
-	unlock(&fake);
-	destroylock(&fake);
-	dprintf("thread %p starts\n", t);
+	lock(&t->runwait, 1);
+	unlock(&t->runwait);
+	dprintf("thread %p run\n", t);
 	t->fn(t->arg);
 	return nil;
 }
