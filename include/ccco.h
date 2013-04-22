@@ -12,9 +12,9 @@ struct Chan {
 	Cond*		sa;	/* recver wants to proceed, or just finished recving */
 	Cond*		sc;	/* send complete */
 	unsigned char*	b;	/* the buffer */
-	long		elsz;	/* size of an elem in buf */
-	long		sz;	/* sz*elsz == sizeof b */
-	long		s;	/* start */
+	volatile long	elsz;	/* size of an elem in buf */
+	volatile long	sz;	/* sz*elsz == sizeof b */
+	volatile long	s;	/* start */
 	volatile long	n;	/* no. elems in buf */
 	volatile int	u;	/* used in unbuffered ops only */
 };
