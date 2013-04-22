@@ -23,8 +23,7 @@ struct _Thread {
 	void*	arg;		/* proc args */
 	pthread_t		t;
 	pthread_attr_t	attr;
-	Cond	wake;	/* thread starts when wake && running */
-	volatile int	running;
+	Lock	runwait;
 	Rand	r;
 };
 
@@ -43,7 +42,7 @@ Thread*
 createthread(void (*fn)(void*), void *arg, int stksz)
 {
 	Thread *t;
-	Cond wake;
+	Lock runwait;
 	pthread_attr_t at;
 	pthread_t p;
 	
@@ -51,7 +50,7 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	if(t == nil)
 		return nil;
 
-	if(initcond(&wake) != 0){
+	if(initlock(&runwait) != 0){
 		free(t);
 		return nil;
 	}
@@ -64,8 +63,8 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	t->name = nil;
 	t->fn = fn;
 	t->arg = arg;
-	t->wake = wake;
-	t->running = 0;
+	t->runwait = runwait;
+	lock(&t->runwait, 1);
 	if(pthread_create(&p, &at, run, t) != 0){
 		errorf("createthread -- pthread_create failed\n");
 		free(t);
@@ -73,8 +72,7 @@ createthread(void (*fn)(void*), void *arg, int stksz)
 	}
 	t->t = p;
 	t->attr = at;
-	t->running = 1;
-	csignal(&t->wake);
+	unlock(&t->runwait);
 	return t;
 }
 
@@ -287,26 +285,16 @@ static void*
 run(void *arg)
 {
 	Thread *t;
-	Lock fake;
-	
-	initlock(&fake);
 	
 	t = (Thread*)arg;
-
+	dprintf("thread %p spawn\n", t);
 	pthread_once(&tlsonce, construct);
 	pthread_setspecific(tlskey, t);
-	
 	initrand(&t->r);
-	
-	lock(&fake, 1);
-	while(!t->running){
-		dprintf("thread suspend\n");
-		wait(&t->wake, &fake);
-	}
-	destroycond(&t->wake);
-	unlock(&fake);
-	destroylock(&fake);
-	dprintf("thread %p starts\n", t);
+	lock(&t->runwait, 1);
+	unlock(&t->runwait);
+	destroylock(&t->runwait);
+	dprintf("thread %p run\n", t);
 	t->fn(t->arg);
 	return nil;
 }
