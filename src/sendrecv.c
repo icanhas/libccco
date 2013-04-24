@@ -114,10 +114,10 @@ bsend(Chan *c, void *p)
 	int nsent;
 	
 	while(c->n >= c->sz){
-		dprintf("send -- buf full, wait\n");
+		dprintf("send -- buf full, wait n=%ld\n", c->n);
 		wait(c->sa, c->l);
 	}
-	dprintf("send -- buf proceed\n");
+	dprintf("send -- buf proceed n=%ld\n", c->n);
 	bp = (c->b + c->elsz * ((c->s + c->n) % c->sz));
 	if(p == nil){
 		memset(bp, 0, c->elsz);
@@ -211,10 +211,10 @@ brecv(Chan *c, void *p)
 	uchar *bp;
 	
 	while(c->n < 1){
-		dprintf("recv -- buf wait\n");
+		dprintf("recv -- buf wait n=%ld\n", c->n);
 		wait(c->da, c->l);
 	}
-	dprintf("recv -- buf proceed\n");
+	dprintf("recv -- buf proceed n=%ld\n", c->n);
 	bp = (c->b + c->elsz * (c->s % c->sz));
 	memmove(p, bp, c->elsz);
 	c->n--;
