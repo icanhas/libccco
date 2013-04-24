@@ -41,7 +41,7 @@ void	freecond(Cond*);
 int	initcond(Cond*);
 void	destroycond(Cond*);
 int	wait(Cond*, Lock*);
-int	csignal(Cond*);
+int	notify(Cond*);
 void	_procsleep(long);
 void	_stlrand(ulong);
 ulong	_tlrand(void);

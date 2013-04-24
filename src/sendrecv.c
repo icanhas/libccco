@@ -94,7 +94,7 @@ usend(Chan *c, void *p)
 	n = c->n;
 	dprintf("send -- unbuf proceed\n");
 	memmove(c->b, p, c->elsz);
-	csignal(c->da);
+	notify(c->da);
 	while(c->n >= n){
 		dprintf("send -- unbuf wait for sc\n");
 		wait(c->sc, c->l);
@@ -128,7 +128,7 @@ bsend(Chan *c, void *p)
 	}
 	c->n++;
 	dprintf("send -- signal\n");
-	csignal(c->da);
+	notify(c->da);
 	unlock(c->l);
 	return nsent;
 }
@@ -147,7 +147,7 @@ nbusend(Chan *c, void *p)
 	dprintf("send -- nb unbuf proceed\n");
 	memmove(c->b, p, c->elsz);
 	c->u = Sdone;
-	csignal(c->da);
+	notify(c->da);
 	unlock(c->l);
 	return 1;
 }
@@ -177,7 +177,7 @@ nbbsend(Chan *c, void *p)
 	}
 	c->n++;
 	dprintf("send -- signal\n");
-	csignal(c->da);
+	notify(c->da);
 	unlock(c->l);
 	return nsent;
 }
@@ -189,7 +189,7 @@ static int
 urecv(Chan *c, void *p)
 {
 	c->n++;
-	csignal(c->sa);
+	notify(c->sa);
 	while(c->u < 1){
 		dprintf("recv -- unbuf wait for send\n");
 		wait(c->da, c->l);
@@ -197,7 +197,7 @@ urecv(Chan *c, void *p)
 	dprintf("recv -- unbuf proceed\n");
 	memmove(p, c->b, c->elsz);
 	c->n--;
-	csignal(c->sc);
+	notify(c->sc);
 	unlock(c->l);
 	return 1;
 }
@@ -219,7 +219,7 @@ brecv(Chan *c, void *p)
 	memmove(p, bp, c->elsz);
 	c->n--;
 	c->s++;
-	csignal(c->sa);
+	notify(c->sa);
 	unlock(c->l);
 	return 1;
 }
@@ -237,7 +237,7 @@ nburecv(Chan *c, void *p)
 	}
 	dprintf("recv -- nb unbuf proceed\n");
 	memmove(p, c->b, c->elsz);
-	csignal(c->sa);
+	notify(c->sa);
 	unlock(c->l);
 	return 1;
 }
@@ -260,7 +260,7 @@ nbbrecv(Chan *c, void *p)
 	memmove(p, bp, c->elsz);
 	c->n--;
 	c->s++;
-	csignal(c->sa);
+	notify(c->sa);
 	unlock(c->l);
 	return 1;
 }

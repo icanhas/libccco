@@ -231,7 +231,7 @@ wait(Cond *c, Lock *l)
 }
 
 int
-csignal(Cond *c)
+notify(Cond *c)
 {
 	assert(c != nil);
 	return pthread_cond_signal(&c->c);

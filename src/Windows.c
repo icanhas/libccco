@@ -248,7 +248,7 @@ wait(Cond *c, Lock *l)
 }
 
 int
-csignal(Cond *c)
+notify(Cond *c)
 {
 	assert(c != nil);
 	
