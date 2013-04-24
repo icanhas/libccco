@@ -6,7 +6,7 @@
 int
 chanopen(Chan *c, long nel, long elsz)
 {
-	Lock *l;
+	Lock *l, *cl;
 	Cond *da, *sa, *sc;
 	uchar *buf;
 
@@ -64,6 +64,6 @@ chanopen(Chan *c, long nel, long elsz)
 	c->sz = nel;
 	c->s = 0;
 	c->n = 0;
-	c->u = 0;
+	c->recvbuf = nil;
 	return 0;
 }

@@ -16,7 +16,7 @@ struct Chan {
 	volatile long	sz;	/* sz*elsz == sizeof b */
 	volatile long	s;	/* start */
 	volatile long	n;	/* no. elems in buf */
-	volatile int	u;	/* used in unbuffered ops only */
+	void* volatile	recvbuf;	/* used in unbuffered ops only */
 };
 
 struct Alt {

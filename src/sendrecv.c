@@ -3,11 +3,6 @@
 #include "dat.h"
 #include "fn.h"
 
-enum {
-	Snone,
-	Sdone
-};
-
 static int	usend(Chan*, void*);
 static int	bsend(Chan*, void*);
 static int	nbusend(Chan*, void*);
@@ -31,6 +26,8 @@ _send(Chan *c, void *p, int blocking)
 		errorf("send -- called on closed channel\n");
 		return -1;
 	}
+	
+	dprintf("send %s n=%ld recvbuf=%p\n", ((c->sz == 0) ? "unbuf" : "buf"), c->n, c->recvbuf);
 
 	lock(c->l, 1);
 	if(blocking){
@@ -63,6 +60,8 @@ _recv(Chan *c, void *p, int blocking)
 		errorf("recv -- called on closed channel\n");
 		return -1;
 	}
+	
+	dprintf("recv %s n=%ld recvbuf=%p\n", ((c->sz == 0) ? "unbuf" : "buf"), c->n, c->recvbuf);
 
 	lock(c->l, 1);
 	if(blocking){
@@ -84,24 +83,25 @@ _recv(Chan *c, void *p, int blocking)
 static int
 usend(Chan *c, void *p)
 {
-	long n;
-
-	c->u++;
-	while(c->n < 1){
-		dprintf("send -- unbuf wait for recver\n");
+	int nsent;
+	
+	while(c->recvbuf == nil){
+		dprintf("send -- unbuf wait for receiver\n");
 		wait(c->sa, c->l);
 	}
-	n = c->n;
-	dprintf("send -- unbuf proceed\n");
-	memmove(c->b, p, c->elsz);
-	notify(c->da);
-	while(c->n >= n){
-		dprintf("send -- unbuf wait for sc\n");
-		wait(c->sc, c->l);
+	dprintf("send -- unbuf rendezvous (recvbuf=%p)\n", c->recvbuf);
+	if(p == nil){
+		memset(c->recvbuf, 0, c->elsz);
+		nsent = 0;
+	}else{
+		memmove(c->recvbuf, p, c->elsz);
+		nsent = 1;
 	}
-	c->u--;
+	c->n = 1;
+	c->recvbuf = nil;
+	notify(c->da);
 	unlock(c->l);
-	return 1;
+	return nsent;
 }
 
 /* 
@@ -146,7 +146,6 @@ nbusend(Chan *c, void *p)
 	}
 	dprintf("send -- nb unbuf proceed\n");
 	memmove(c->b, p, c->elsz);
-	c->u = Sdone;
 	notify(c->da);
 	unlock(c->l);
 	return 1;
@@ -187,16 +186,22 @@ nbbsend(Chan *c, void *p)
  */
 static int
 urecv(Chan *c, void *p)
-{
-	c->n++;
+{	
+	while(c->recvbuf != nil){
+		/* 
+		 * Another receiver got here before us; wait for a sender
+		 * to meet it and do the op.
+		 */
+		wait(c->sc, c->l);
+	}
+	c->recvbuf = p;
 	notify(c->sa);
-	while(c->u < 1){
-		dprintf("recv -- unbuf wait for send\n");
+	while(c->n != 1){
+		dprintf("recv -- unbuf wait for sender\n");
 		wait(c->da, c->l);
 	}
-	dprintf("recv -- unbuf proceed\n");
-	memmove(p, c->b, c->elsz);
-	c->n--;
+	dprintf("recv -- unbuf rendezvous done\n");
+	c->n = 0;
 	notify(c->sc);
 	unlock(c->l);
 	return 1;
@@ -230,7 +235,7 @@ brecv(Chan *c, void *p)
 static int
 nburecv(Chan *c, void *p)
 {
-	if(c->u != Sdone){
+	if(1 /* c->u != Sdone */){
 		dprintf("recv -- nb unbuf return\n");
 		unlock(c->l);
 		return 0;
