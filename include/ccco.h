@@ -6,12 +6,12 @@ typedef struct _Thread	Thread;
 typedef struct _Cond	Cond;
 
 struct Chan {
-	Lock*		l;
-	unsigned short	status;	/* open or not (dat.h) */
-	Cond*		da;	/* data became available in buf */
-	Cond*		sa;	/* recver wants to proceed, or just finished recving */
-	Cond*		sc;	/* send complete */
-	unsigned char*	b;	/* the buffer */
+	Lock* 		l;
+	volatile unsigned short	status;	/* open or not (dat.h) */
+	Cond* 		da;	/* data became available in buf */
+	Cond* 		sa;	/* recver wants to proceed, or just finished recving */
+	Cond* 		sc;	/* send complete */
+	unsigned char* volatile 	b;	/* the buffer */
 	volatile long	elsz;	/* size of an elem in buf */
 	volatile long	sz;	/* sz*elsz == sizeof b */
 	volatile long	s;	/* start */

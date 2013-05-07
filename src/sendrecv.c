@@ -139,14 +139,26 @@ bsend(Chan *c, void *p)
 static int
 nbusend(Chan *c, void *p)
 {
-	if(c->n < 1){
+	if(c->s != 0){
+		dprintf("send -- nb unbuf channel already has sender\n");
+		unlock(c->l);
+		return 0;
+	}
+	c->s = 1;
+	if(c->recvbuf == nil){
 		dprintf("send -- nb unbuf no recver, return\n");
 		unlock(c->l);
 		return 0;
 	}
-	dprintf("send -- nb unbuf proceed\n");
-	memmove(c->b, p, c->elsz);
+	dprintf("send -- nb unbuf rendezvous\n");
+	memmove(c->recvbuf, p, c->elsz);
+	c->n = 1;
+	c->s = 0;
 	notify(c->da);
+	while(c->n != 0){
+		wait(c->sa, c->l);
+	}
+	c->recvbuf = nil;
 	unlock(c->l);
 	return 1;
 }
@@ -235,14 +247,24 @@ brecv(Chan *c, void *p)
 static int
 nburecv(Chan *c, void *p)
 {
-	if(1 /* c->u != Sdone */){
-		dprintf("recv -- nb unbuf return\n");
+	if(c->recvbuf != nil){
+		dprintf("recv -- nb unbuf channel already has recver\n");
 		unlock(c->l);
 		return 0;
 	}
-	dprintf("recv -- nb unbuf proceed\n");
-	memmove(p, c->b, c->elsz);
+	c->recvbuf = p;
+	if(c->s == 0){
+		dprintf("recv -- nb unbuf no sender\n");
+		c->recvbuf = nil;
+		unlock(c->l);
+		return 0;
+	}
+	dprintf("recv -- nb unbuf rendezvous\n");
 	notify(c->sa);
+	while(c->n != 1){
+		wait(c->da, c->l);
+	}
+	c->n = 0;
 	unlock(c->l);
 	return 1;
 }

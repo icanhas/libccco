@@ -55,7 +55,6 @@ chanopen(Chan *c, long nel, long elsz)
 		return -1;
 	}
 	c->l = l;
-	c->status = Open;
 	c->da = da;
 	c->sa = sa;
 	c->sc = sc;
@@ -65,5 +64,6 @@ chanopen(Chan *c, long nel, long elsz)
 	c->s = 0;
 	c->n = 0;
 	c->recvbuf = nil;
+	c->status = Open;
 	return 0;
 }
